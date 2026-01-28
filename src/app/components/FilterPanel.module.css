@@ -99,6 +99,64 @@
     margin-bottom: 12px;
 }
 
+.inlineApplyButton {
+    width: calc(100% - 32px);
+    margin: -4px 16px 16px 16px;
+    padding: 12px;
+    /* 프리미엄 그라데이션 적용 */
+    background: linear-gradient(135deg, #FA880B 0%, #FF9E3D 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    /* 입체적인 듀얼 그림자 */
+    box-shadow:
+        0 4px 15px rgba(250, 136, 11, 0.3),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: fadeInDown 0.3s ease-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.inlineApplyButton::after {
+    content: '→';
+    font-size: 1.1rem;
+    transition: transform 0.3s ease;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.inlineApplyButton:hover {
+    background: linear-gradient(135deg, #FF9E3D 0%, #FA880B 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(250, 136, 11, 0.4);
+}
+
+.inlineApplyButton:hover::after {
+    transform: translateX(4px);
+}
+
+.inlineApplyButton:active {
+    transform: scale(0.97);
+    box-shadow: 0 2px 8px rgba(250, 136, 11, 0.3);
+}
+
 .checkboxParams {
     display: flex;
     align-items: center;
