@@ -141,171 +141,169 @@ export default function BottomSheet({
         {/* 본문 영역 */}
         <div className={styles.content}>
           {/* 탭 A: 리스트 */}
-          {
-            sheetTab === 'list' && (
-              <div className={styles.panelContent}>
-                {places.length === 0 ? (
-                  <div className={styles.emptyState}>
-                    화면 내에 맛집이 없습니다.
-                  </div>
-                ) : (
-                  <div className={styles.listContainer}>
-                    {places.map(place => {
-                      const isActive = focusedPlace && focusedPlace.id === place.id;
+          {sheetTab === 'list' && (
+            <div className={styles.panelContent}>
+              {places.length === 0 ? (
+                <div className={styles.emptyState}>
+                  화면 내에 맛집이 없습니다.
+                </div>
+              ) : (
+                <div className={styles.listContainer}>
+                  {places.map(place => {
+                    const isActive = focusedPlace && focusedPlace.id === place.id;
 
-                      if (isActive) {
-                        const [mediaChannelRaw, mediaProgramRaw] = place.media.split('|');
-                        const mediaChannel = mediaChannelRaw?.trim() || '';
-                        const mediaProgram = mediaProgramRaw?.trim() || '';
-                        const youtubeQuery = `${place.name} ${mediaChannel || ''}`.trim();
-                        const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
-                        const naverUrl = place.naver_url && place.naver_url.trim().length > 0
-                          ? place.naver_url
-                          : `https://m.place.naver.com/search?q=${encodeURIComponent(place.name)}`;
-
-                        return (
-                          <div key={place.id} className={`${styles.item} ${styles.itemSelected}`}>
-                            <div className={styles.itemImage}>
-                              <PlaceImage src={place.image_url} alt={place.name} />
-                            </div>
-                            <div className={styles.itemInfo}>
-                              <div className={styles.itemName}>{place.name}</div>
-                              <div className={styles.itemMedia}>
-                                📺 {mediaChannel || place.media}
-                              </div>
-                              {place.address && (
-                                <div className={styles.itemRow}>
-                                  <span>📍</span>
-                                  <span>{place.address}</span>
-                                </div>
-                              )}
-                              {place.phone && place.phone.trim().length > 0 && (
-                                <div className={styles.itemRow}>
-                                  <span>📞</span>
-                                  <span>{place.phone}</span>
-                                </div>
-                              )}
-                              {place.description && (
-                                <div className={styles.itemDesc}>{place.description}</div>
-                              )}
-                              <div className={styles.detailActions}>
-                                <a
-                                  href={youtubeUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className={`${styles.detailButton} ${styles.youtubeButton}`}
-                                >
-                                  유튜브 보기
-                                </a>
-                                <a
-                                  href={naverUrl}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className={`${styles.detailButton} ${styles.naverButton}`}
-                                >
-                                  <span>
-                                    네이버
-                                    <br />
-                                    플레이스
-                                  </span>
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      }
+                    if (isActive) {
+                      const [mediaChannelRaw, mediaProgramRaw] = place.media.split('|');
+                      const mediaChannel = mediaChannelRaw?.trim() || '';
+                      const mediaProgram = mediaProgramRaw?.trim() || '';
+                      const youtubeQuery = `${place.name} ${mediaChannel || ''}`.trim();
+                      const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
+                      const naverUrl = place.naver_url && place.naver_url.trim().length > 0
+                        ? place.naver_url
+                        : `https://m.place.naver.com/search?q=${encodeURIComponent(place.name)}`;
 
                       return (
-                        <div
-                          key={place.id}
-                          className={styles.item}
-                          onClick={() => onPlaceClick(place)}
-                        >
+                        <div key={place.id} className={`${styles.item} ${styles.itemSelected}`}>
                           <div className={styles.itemImage}>
                             <PlaceImage src={place.image_url} alt={place.name} />
                           </div>
                           <div className={styles.itemInfo}>
                             <div className={styles.itemName}>{place.name}</div>
                             <div className={styles.itemMedia}>
-                              📺 {place.media.split('|')[0]}
+                              📺 {mediaChannel || place.media}
                             </div>
-                            <div className={styles.itemDesc}>{place.description}</div>
+                            {place.address && (
+                              <div className={styles.itemRow}>
+                                <span>📍</span>
+                                <span>{place.address}</span>
+                              </div>
+                            )}
+                            {place.phone && place.phone.trim().length > 0 && (
+                              <div className={styles.itemRow}>
+                                <span>📞</span>
+                                <span>{place.phone}</span>
+                              </div>
+                            )}
+                            {place.description && (
+                              <div className={styles.itemDesc}>{place.description}</div>
+                            )}
+                            <div className={styles.detailActions}>
+                              <a
+                                href={youtubeUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`${styles.detailButton} ${styles.youtubeButton}`}
+                              >
+                                유튜브 보기
+                              </a>
+                              <a
+                                href={naverUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className={`${styles.detailButton} ${styles.naverButton}`}
+                              >
+                                <span>
+                                  네이버
+                                  <br />
+                                  플레이스
+                                </span>
+                              </a>
+                            </div>
                           </div>
                         </div>
                       );
-                    })}
-                  </div >
-                )}
+                    }
 
-                {/* 모바일 푸터 */}
-                <div className={styles.mobileFooter}>
-                  <span className={styles.footerLabel}>Tube Map 안내</span>
-                  <button
-                    type="button"
-                    className={styles.footerLink}
-                    onClick={() => setOpenInfoPanel('about')}
-                  >
-                    서비스 소개
-                  </button>
-                  <span className={styles.footerDivider}>·</span>
-                  <button
-                    type="button"
-                    className={styles.footerLink}
-                    onClick={() => setOpenInfoPanel('privacy')}
-                  >
-                    개인정보
-                  </button>
-                  <span className={styles.footerDivider}>·</span>
-                  <button
-                    type="button"
-                    className={styles.footerLink}
-                    onClick={() => setOpenInfoPanel('ads')}
-                  >
-                    광고 안내
-                  </button>
+                    return (
+                      <div
+                        key={place.id}
+                        className={styles.item}
+                        onClick={() => onPlaceClick(place)}
+                      >
+                        <div className={styles.itemImage}>
+                          <PlaceImage src={place.image_url} alt={place.name} />
+                        </div>
+                        <div className={styles.itemInfo}>
+                          <div className={styles.itemName}>{place.name}</div>
+                          <div className={styles.itemMedia}>
+                            📺 {place.media.split('|')[0]}
+                          </div>
+                          <div className={styles.itemDesc}>{place.description}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div >
-              </div >
-            )}
+              )}
+
+              {/* 모바일 푸터 */}
+              <div className={styles.mobileFooter}>
+                <span className={styles.footerLabel}>Tube Map 안내</span>
+                <button
+                  type="button"
+                  className={styles.footerLink}
+                  onClick={() => setOpenInfoPanel('about')}
+                >
+                  서비스 소개
+                </button>
+                <span className={styles.footerDivider}>·</span>
+                <button
+                  type="button"
+                  className={styles.footerLink}
+                  onClick={() => setOpenInfoPanel('privacy')}
+                >
+                  개인정보
+                </button>
+                <span className={styles.footerDivider}>·</span>
+                <button
+                  type="button"
+                  className={styles.footerLink}
+                  onClick={() => setOpenInfoPanel('ads')}
+                >
+                  광고 안내
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* 탭 B: 디스커버리 */}
-          {
-            sheetTab === 'discovery' && (
-              <div className={styles.panelContent}>
-                <DiscoveryPanel
-                  places={allPlaces}
-                  discoveryFilter={discoveryFilter}
-                  onDiscoveryFilterChange={onDiscoveryFilterChange}
-                />
+          {sheetTab === 'discovery' && (
+            <div className={styles.panelContent}>
+              <DiscoveryPanel
+                places={allPlaces}
+                discoveryFilter={discoveryFilter}
+                onDiscoveryFilterChange={onDiscoveryFilterChange}
+              />
 
-                {/* 모바일 푸터 */}
-                <div className={styles.mobileFooter}>
-                  <span className={styles.footerLabel}>Tube Map 안내</span>
-                  <button
-                    type="button"
-                    className={styles.footerLink}
-                    onClick={() => setOpenInfoPanel('about')}
-                  >
-                    서비스 소개
-                  </button>
-                  <span className={styles.footerDivider}>·</span>
-                  <button
-                    type="button"
-                    className={styles.footerLink}
-                    onClick={() => setOpenInfoPanel('privacy')}
-                  >
-                    개인정보
-                  </button>
-                  <span className={styles.footerDivider}>·</span>
-                  <button
-                    type="button"
-                    className={styles.footerLink}
-                    onClick={() => setOpenInfoPanel('ads')}
-                  >
-                    광고 안내
-                  </button>
-                </div>
+              {/* 모바일 푸터 */}
+              <div className={styles.mobileFooter}>
+                <span className={styles.footerLabel}>Tube Map 안내</span>
+                <button
+                  type="button"
+                  className={styles.footerLink}
+                  onClick={() => setOpenInfoPanel('about')}
+                >
+                  서비스 소개
+                </button>
+                <span className={styles.footerDivider}>·</span>
+                <button
+                  type="button"
+                  className={styles.footerLink}
+                  onClick={() => setOpenInfoPanel('privacy')}
+                >
+                  개인정보
+                </button>
+                <span className={styles.footerDivider}>·</span>
+                <button
+                  type="button"
+                  className={styles.footerLink}
+                  onClick={() => setOpenInfoPanel('ads')}
+                >
+                  광고 안내
+                </button>
               </div>
-            )}
+            </div>
+          )}
         </div>
 
         {/* 하단 고정 탭바 */}
@@ -392,5 +390,6 @@ export default function BottomSheet({
           </div>
         )}
       </div>
-      );
+    </div>
+  );
 }
