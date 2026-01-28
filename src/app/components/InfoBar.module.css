@@ -1,0 +1,125 @@
+.bar {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1200;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FA880B 0%, #FFB74D 100%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  font-size: 13px;
+  color: #fff;
+}
+
+.barLabel {
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.2px;
+}
+
+.linkButton {
+  border: none;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 4px 10px;
+  margin: 0;
+  font-size: 12px;
+  color: #fff;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.12s ease;
+  backdrop-filter: blur(4px);
+}
+
+.linkButton:hover {
+  background: rgba(255, 255, 255, 0.30);
+  transform: translateY(-1px);
+}
+
+.divider {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel {
+  width: min(480px, 92vw);
+  max-height: 80vh;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px 10px;
+  font-size: 13px;
+}
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.panelTitle {
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: -0.2px;
+}
+
+.closeButton {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.panelBody {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 4px;
+  line-height: 1.5;
+  color: #444;
+}
+
+.panelBody p {
+  margin: 0 0 8px;
+}
+
+.panelFooter {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.mailLink {
+  color: #0366d6;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .bar {
+    bottom: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .linkButton {
+    font-size: 11px;
+  }
+}
+

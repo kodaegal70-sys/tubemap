@@ -1,0 +1,149 @@
+.searchWrapper {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 460px;
+    pointer-events: none;
+}
+
+.searchBar {
+    display: flex;
+    align-items: center;
+    background: white;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    /* 그림자 강화 */
+    gap: 12px;
+    border: 1px solid #eee;
+    pointer-events: auto;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.brandLogo {
+    width: 22px;
+    height: 22px;
+    border-radius: 0;
+    background: transparent url('/images/logo.png') center center / contain no-repeat;
+}
+
+.brandText {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.brandName {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #222;
+}
+
+.brandSlogan {
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.searchInputArea {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+}
+
+.input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.icon {
+    font-size: 1.2rem;
+    color: #FA880B;
+}
+
+.chipScroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 5px;
+    -webkit-overflow-scrolling: touch;
+    pointer-events: auto;
+}
+
+/* Hide scrollbar */
+.chipScroll::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: #FFE0B2;
+    /* 연한 주황 배경 */
+    border: 1px solid #222;
+    /* 가시성 좋은 얇은 검정 테두리 */
+    border-radius: 20px;
+    font-size: 0.85rem;
+    color: #8D4F00;
+    /* 주황 톤 텍스트 */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.chipActive {
+    background: #FA880B;
+    /* 진한 주황 단색 */
+    color: #fff;
+    border-color: #222;
+    /* 선택 상태도 동일하게 얇은 검정 테두리 */
+}
+
+.myLocationRow {
+    margin-top: 6px;
+    pointer-events: auto;
+}
+
+.myLocationButton {
+    border: none;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    background: #ffffff;
+    color: #333;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+}
+
+/* 모바일 전용: 좌우 여백 동일하게, 칩/버튼 크기 조정 */
+@media (max-width: 768px) {
+    .searchWrapper {
+        right: 10px;
+        max-width: none;
+    }
+
+    .chipScroll {
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
+
+    .chip {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        margin-bottom: 4px;
+    }
+}

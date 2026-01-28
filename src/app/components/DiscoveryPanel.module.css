@@ -1,0 +1,217 @@
+.discoveryPanel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 16px;
+}
+
+.searchBox {
+  margin-bottom: 8px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  font-size: 14px;
+  outline: none;
+}
+
+.searchInput:focus {
+  border-color: #FA880B;
+  background-color: white;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid #f0f0f0;
+  padding-bottom: 8px;
+}
+
+.tab {
+  flex: 1;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s;
+}
+
+.tab.activeTab {
+  color: #FA880B;
+}
+
+.tab.activeTab::after {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  left: 20%;
+  right: 20%;
+  height: 3px;
+  background-color: #FA880B;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.listContainer {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.checkboxItem {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.checkboxItem:hover {
+  background-color: #f0f0f0;
+}
+
+.checkboxItem.selected {
+  background-color: #FFF3E0;
+  border-color: #FA880B;
+}
+
+.rank {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.mediaTitle {
+  flex: 1;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #222;
+}
+
+.tag {
+  font-size: 0.85rem;
+  color: #666;
+  background-color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  margin-left: 8px;
+}
+
+.emptyState {
+  padding: 40px 0;
+  text-align: center;
+  color: #999;
+  font-size: 0.9rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 0;
+  border-top: 1px solid #f0f0f0;
+}
+
+.pageButton {
+  border: none;
+  background: #f8f9fa;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pageButton:hover:not(:disabled) {
+  background: #e9ecef;
+}
+
+.pageButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.actionBar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid #f0f0f0;
+  position: sticky;
+  bottom: 0;
+  background-color: white;
+  margin-top: auto;
+}
+
+.resetButton {
+  flex: 1;
+  padding: 14px;
+  background-color: #f8f9fa;
+  color: #666;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.resetButton:hover {
+  background-color: #e9ecef;
+}
+
+.applyButton {
+  flex: 2;
+  padding: 14px;
+  background-color: #FA880B;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.applyButton:hover {
+  background-color: #e67a00;
+}

@@ -1,0 +1,9 @@
+@echo off
+echo Uninstalling react-naver-maps...
+call npm uninstall react-naver-maps -f
+
+echo Installing @supabase/supabase-js...
+call npm install @supabase/supabase-js -f
+
+echo Running seed script...
+node scripts/seed.js

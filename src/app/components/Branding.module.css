@@ -1,0 +1,45 @@
+.brandingCard {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 10px 22px;
+    /* 16px 32px -> 축소 */
+    border-radius: 40px;
+    /* 60px -> 축소 */
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: none;
+    border-bottom: 4px solid #FA880B;
+    /* Zigbang Orange Accent */
+}
+
+.title {
+    font-size: 22px;
+    /* 32px -> 22px */
+    font-weight: 900;
+    color: #FA880B;
+    margin: 0;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: -0.5px;
+}
+
+.icon {
+    font-size: 20px;
+}
+
+.slogan {
+    font-size: 11px;
+    /* 15px -> 11px */
+    font-weight: 700;
+    color: #555;
+    margin: 0;
+    white-space: nowrap;
+}

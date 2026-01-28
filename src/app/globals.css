@@ -1,0 +1,78 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --sidebar-width: 400px;
+  --bottom-sheet-peek: 100px;
+  --bottom-sheet-half: 50dvh;
+  --bottom-sheet-full: 90dvh;
+}
+
+html,
+body {
+  max-width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: none;
+  /* Android 당겨서 새로고침 방지 */
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+  /* Android 터치 시 파란 박스 제거 */
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  -webkit-user-drag: none;
+  /* 이미지 드래그 방지 */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* 반응형 유틸리티 */
+
+/* 모바일에서 숨김 */
+@media (max-width: 767px) {
+  .hide-mobile {
+    display: none !important;
+  }
+
+  /* 광고 영역 크기 조정 */
+  .ad-container-mobile {
+    transform: scale(0.8) !important;
+    bottom: 50px !important;
+  }
+
+  /* 로딩 메시지 크기 조정 */
+  .loading-message-mobile {
+    font-size: 12px !important;
+    padding: 8px 16px !important;
+  }
+}
+
+/* 데스크톱에서 숨김 */
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+/* 태블릿 */
+@media (max-width: 1024px) {
+  .ad-container-tablet {
+    transform: scale(0.9) !important;
+  }
+}

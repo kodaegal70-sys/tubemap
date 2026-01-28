@@ -1,0 +1,104 @@
+[
+  {
+    "source": {
+      "channel_name": "tzuyang쯔양",
+      "video_id": "PcwjmL-aJxg",
+      "video_url": "https://www.youtube.com/watch?v=PcwjmL-aJxg"
+    },
+    "place": {
+      "kakao_place_id": "13584658",
+      "store_name": "왕돈까스",
+      "category": "돈까스,우동",
+      "address": "서울 강남구 대치동 957-22",
+      "lat": 37.5053469298283,
+      "lng": 127.059018893941,
+      "phone": "02-561-1541"
+    },
+    "extraction_method": "openai"
+  },
+  {
+    "source": {
+      "channel_name": "tzuyang쯔양",
+      "video_id": "2if2TjgSVEY",
+      "video_url": "https://www.youtube.com/watch?v=2if2TjgSVEY"
+    },
+    "place": {
+      "kakao_place_id": "769325731",
+      "store_name": "우지커피 석촌역점",
+      "category": "우지커피",
+      "address": "서울 송파구 송파동 17-3",
+      "lat": 37.5070602628826,
+      "lng": 127.107988122181,
+      "phone": "02-423-0832"
+    },
+    "extraction_method": "openai"
+  },
+  {
+    "source": {
+      "channel_name": "tzuyang쯔양",
+      "video_id": "SbjywgoDGF4",
+      "video_url": "https://www.youtube.com/watch?v=SbjywgoDGF4"
+    },
+    "place": {
+      "kakao_place_id": "24074380",
+      "store_name": "먹방",
+      "category": "육류,고기",
+      "address": "경북 경주시 노서동 179-6",
+      "lat": 35.8411121888036,
+      "lng": 129.202749600465,
+      "phone": "054-744-8259"
+    },
+    "extraction_method": "regex"
+  },
+  {
+    "source": {
+      "channel_name": "문복희 Eat with Boki",
+      "video_id": "L1mSmsy6v-E",
+      "video_url": "https://www.youtube.com/watch?v=L1mSmsy6v-E"
+    },
+    "place": {
+      "kakao_place_id": "1802943590",
+      "store_name": "교촌치킨 종로1호점",
+      "category": "교촌치킨",
+      "address": "서울 종로구 관철동 13-13",
+      "lat": 37.56924357031777,
+      "lng": 126.98595938774261,
+      "phone": "02-737-9292"
+    },
+    "extraction_method": "openai"
+  },
+  {
+    "source": {
+      "channel_name": "문복희 Eat with Boki",
+      "video_id": "TG7vqQq3VHg",
+      "video_url": "https://www.youtube.com/watch?v=TG7vqQq3VHg"
+    },
+    "place": {
+      "kakao_place_id": "25429738",
+      "store_name": "KFC 부산서면점",
+      "category": "KFC",
+      "address": "부산 부산진구 부전동 241-17",
+      "lat": 35.153604094502526,
+      "lng": 129.0588459697517,
+      "phone": "051-808-8996"
+    },
+    "extraction_method": "openai"
+  },
+  {
+    "source": {
+      "channel_name": "문복희 Eat with Boki",
+      "video_id": "n-F62evi4kI",
+      "video_url": "https://www.youtube.com/watch?v=n-F62evi4kI"
+    },
+    "place": {
+      "kakao_place_id": "676277614",
+      "store_name": "불닭발맛집",
+      "category": "닭요리",
+      "address": "충북 진천군 광혜원면 광혜원리 529-100",
+      "lat": 36.9924678983337,
+      "lng": 127.438395823681,
+      "phone": ""
+    },
+    "extraction_method": "openai"
+  }
+]

@@ -1,0 +1,3 @@
+@echo off
+echo Installing additional libraries with legacy-peer-deps...
+call npm install react-naver-maps axios --legacy-peer-deps

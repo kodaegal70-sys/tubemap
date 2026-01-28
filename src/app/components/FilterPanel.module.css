@@ -1,0 +1,348 @@
+.filterPanel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 100vh;
+    background: #FA880B;
+    /* 직방 오렌지 배경 */
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    /* 상하좌우 오렌지 바탕 여백 확보 */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    /* 간격 축소 */
+    font-family: 'Pretendard', sans-serif;
+    transition: transform 0.3s ease-in-out;
+}
+
+.mobileWrapper {
+    width: 100%;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.closed {
+    transform: translateX(400px);
+}
+
+.toggleBtn {
+    position: absolute;
+    top: 20px;
+    left: -40px;
+    /* 패널 밖으로 돌출 */
+    width: 40px;
+    height: 40px;
+    background-color: white;
+    border-radius: 8px 0 0 8px;
+    /* 왼쪽으로 라운드 */
+    box-shadow: -2px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 90;
+    font-size: 18px;
+    /* 기호 크기 통일 */
+    border: 1px solid #eee;
+    border-right: none;
+    transition: all 0.2s ease;
+    color: #FA880B;
+}
+
+.toggleBtn:hover {
+    background-color: #f8f9fa;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    margin: 0;
+}
+
+.resetBtn {
+    font-size: 12px;
+    color: #FA880B;
+    background: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.resetBtn:hover {
+    background: #f0f0f0;
+}
+
+.section {
+    display: flex;
+    flex-direction: column;
+    /* flex: 1 제거하여 불필요한 늘어짐 방지 */
+}
+
+.sectionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 12px;
+}
+
+.checkboxParams {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    margin: 8px 0;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 2px solid white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.checkboxParams:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.selected {
+    background-color: #333 !important;
+    border-color: #000 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.selected .rank,
+.selected .mediaTitle,
+.selected .tag {
+    color: white !important;
+}
+
+.selected .tag {
+    background: rgba(255, 255, 255, 0.25) !important;
+}
+
+.rank {
+    margin-right: 12px;
+    font-weight: 900;
+    width: 24px;
+    text-align: center;
+    font-size: 15px;
+}
+
+.mediaTitle {
+    flex: 1;
+    font-weight: 700;
+    color: #333;
+    font-size: 14px;
+}
+
+.tag {
+    background: #FFF3E0;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    color: #333;
+    font-weight: 800;
+}
+
+.count {
+    font-size: 12px;
+    color: #999;
+    margin-left: auto;
+}
+
+.tabs {
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.1);
+    /* 오렌지 배경과 조화로운 다크 톤 */
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.tab {
+    flex: 1;
+    padding: 8px 0;
+    font-size: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.activeTab {
+    background: white;
+    color: #FA880B;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listContainer {
+    max-height: 600px;
+    /* 10개 항목 노출에 최적화 */
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.4) #FA880B;
+}
+
+.listContainer::-webkit-scrollbar {
+    width: 6px;
+}
+
+.listContainer::-webkit-scrollbar-track {
+    background: #FA880B;
+}
+
+.listContainer::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.4);
+    border-radius: 4px;
+}
+
+/* 반응형 미디어 쿼리 - 단계별 명확한 변화 */
+
+/* 대형 데스크톱 (> 1600px) - 기본 크기 유지 */
+/* .filterPanel { width: 400px; } */
+
+/* 중형 데스크톱 (1200px - 1600px) */
+@media (max-width: 1600px) {
+    .filterPanel {
+        width: 360px;
+        padding: 18px;
+    }
+
+    .title {
+        font-size: 19px;
+    }
+
+    .listContainer {
+        max-height: 550px;
+    }
+}
+
+/* 소형 데스크톱 (1024px - 1200px) */
+@media (max-width: 1200px) {
+    .filterPanel {
+        width: 320px;
+        padding: 16px;
+    }
+
+    .closed {
+        transform: translateX(320px);
+    }
+
+    .title {
+        font-size: 18px;
+    }
+
+    .checkboxParams {
+        padding: 10px 14px;
+        margin: 6px 0;
+    }
+
+    .mediaTitle {
+        font-size: 13px;
+    }
+
+    .listContainer {
+        max-height: 500px;
+    }
+}
+
+/* 태블릿 (768px - 1024px) */
+@media (max-width: 1024px) {
+    .filterPanel {
+        width: 280px;
+        padding: 14px;
+    }
+
+    .closed {
+        transform: translateX(280px);
+    }
+
+    .title {
+        font-size: 17px;
+    }
+
+    .sectionTitle {
+        font-size: 13px;
+    }
+
+    .checkboxParams {
+        padding: 9px 12px;
+        margin: 5px 0;
+    }
+
+    .mediaTitle {
+        font-size: 12px;
+    }
+
+    .tag {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .listContainer {
+        max-height: 450px;
+    }
+}
+
+/* 모바일 (< 768px) */
+@media (max-width: 767px) {
+    .filterPanel {
+        width: 100%;
+        max-width: 320px;
+        padding: 12px;
+    }
+
+    .closed {
+        transform: translateX(100%);
+    }
+
+    .toggleBtn {
+        left: -50px;
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+        border-radius: 12px 0 0 12px;
+    }
+
+    .title {
+        font-size: 16px;
+    }
+
+    .sectionTitle {
+        font-size: 13px;
+    }
+
+    .checkboxParams {
+        padding: 10px 12px;
+        margin: 6px 0;
+    }
+
+    .mediaTitle {
+        font-size: 13px;
+    }
+
+    .tag {
+        font-size: 10px;
+        padding: 2px 8px;
+    }
+
+    .listContainer {
+        max-height: 400px;
+    }
+}
