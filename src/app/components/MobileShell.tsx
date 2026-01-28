@@ -37,6 +37,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   } = useMobile();
 
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
 
   // URL 파라미터와 동기화
   useEffect(() => {
@@ -113,89 +114,32 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   }, [setSelectedPlaceId, setSheetState, router]);
 
   // 검색 핸들러
-  const handleSearch = useCallback(async (keyword: string) => {
-    if (keyword.trim()) {
+  const handleSearch = useCallback((keyword: string) => {
+    const trimmed = keyword.trim();
+    if (trimmed) {
+      // 1) 로컬 맛집 필터링 (리스트 탭에 즉시 반영)
       const filtered = filteredPlaces.filter(p =>
-        p.name.includes(keyword) ||
-        p.address?.includes(keyword) ||
-        p.description?.includes(keyword)
+        p.name.includes(trimmed) ||
+        p.address?.includes(trimmed) ||
+        p.description?.includes(trimmed)
       );
 
-      // 검색 결과가 있으면 첫 번째 장소 선택
+      // 검색 결과가 있으면 리스트 업데이트
       if (filtered.length > 0) {
         setPlaces(filtered);
-        const firstPlace = filtered[0];
-        setSelectedPlaceId(firstPlace.id);
-        setSheetState('half');
-        router.push(`?placeId=${firstPlace.id}`, { scroll: false });
-      } else {
-        // 검색 결과가 없으면 Kakao 지오코딩으로 지역 검색
-        try {
-          // 먼저 주소 검색 시도
-          let response = await fetch(
-            `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(keyword)}`,
-            {
-              headers: {
-                Authorization: `KakaoAK 4f9be0b1a37f4ccb4512a300a3f067a6`,
-              },
-            }
-          );
-          let data = await response.json();
-
-          console.log('주소 검색 결과:', data);
-
-          // 주소 검색 결과가 없으면 키워드 검색 시도
-          if (!data.documents || data.documents.length === 0) {
-            response = await fetch(
-              `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(keyword)}`,
-              {
-                headers: {
-                  Authorization: `KakaoAK 4f9be0b1a37f4ccb4512a300a3f067a6`,
-                },
-              }
-            );
-            data = await response.json();
-            console.log('키워드 검색 결과:', data);
-          }
-
-          if (data.documents && data.documents.length > 0) {
-            const location = data.documents[0];
-            // 가상의 Place 객체 생성
-            const virtualPlace: Place = {
-              id: -1,
-              name: location.address_name || location.place_name || keyword,
-              lat: parseFloat(location.y),
-              lng: parseFloat(location.x),
-              address: location.address_name || location.road_address_name || '',
-              category: '기타',
-              media: '검색 결과',
-              description: `${keyword} 검색 결과`,
-              image_url: '',
-              naver_url: '',
-              phone: '',
-            };
-
-            console.log('가상 Place 생성:', virtualPlace);
-
-            // 가상 Place를 리스트에 추가하고 선택
-            setPlaces([virtualPlace]);
-            setSelectedPlaceId(virtualPlace.id);
-            setSheetState('half');
-          } else {
-            setPlaces([]);
-            alert('검색 결과가 없습니다.');
-          }
-        } catch (error) {
-          console.error('지오코딩 실패:', error);
-          setPlaces([]);
-          alert('검색 중 오류가 발생했습니다.');
-        }
       }
+
+      // 2) 지도 이동을 위한 검색어 상태 업데이트
+      setSearchKeyword(trimmed);
+
+      // 3) 모바일 UX: 검색 시 바텀시트를 half로 변경하여 지도와 리스트를 동시에 보게 함
+      setSheetState('half');
     } else {
-      // 검색어가 없으면 필터링된 장소 사용
+      // 검색어가 없으면 필터링된 장소 초기화
       setPlaces(filteredPlaces.slice(0, 50));
+      setSearchKeyword('');
     }
-  }, [filteredPlaces, setPlaces, setSelectedPlaceId, setSheetState, router]);
+  }, [filteredPlaces, setPlaces, setSheetState, setSearchKeyword]);
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
@@ -259,6 +203,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
         isMobile={true}
         mobileSheetState={sheetState}
         myLocation={myLocation}
+        searchKeyword={searchKeyword}
       />
 
       {/* 상단 검색바 + 카테고리 칩 */}
