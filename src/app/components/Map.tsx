@@ -15,6 +15,7 @@ type Props = {
     isMobile?: boolean;
     mobileSheetState?: 'peek' | 'half' | 'full';
     myLocation?: { lat: number; lng: number } | null;
+    searchKeyword?: string;
 };
 
 declare global { interface Window { kakao: any; } }
@@ -22,7 +23,7 @@ declare global { interface Window { kakao: any; } }
 const BASE_IMAGE_SRC = "/images/logo.png";
 const ACTIVE_IMAGE_SRC = "/images/logo.png";
 
-export default function MapComponent({ places, focusedPlace, onMapMove, onMapStateChange, onMarkerClick, onManualInteraction, fitBoundsTrigger, isMobile, mobileSheetState, myLocation }: Props) {
+export default function MapComponent({ places, focusedPlace, onMapMove, onMapStateChange, onMarkerClick, onManualInteraction, fitBoundsTrigger, isMobile, mobileSheetState, myLocation, searchKeyword }: Props) {
     const mapRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isSdkLoaded, setIsSdkLoaded] = useState(false);
@@ -240,6 +241,58 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         map.setLevel(4);
         map.panTo(new window.kakao.maps.LatLng(myLocation.lat, myLocation.lng));
     }, [myLocation, isSdkLoaded]);
+
+    // 7. Keyword Search & Move (지역명 검색 시 영역 이동)
+    useEffect(() => {
+        const map = mapRef.current;
+        if (!map || !isSdkLoaded || !searchKeyword || searchKeyword.trim() === '') return;
+
+        console.log('Searching for keyword:', searchKeyword);
+        const ps = new window.kakao.maps.services.Places();
+
+        ps.keywordSearch(searchKeyword, (data: any, status: any) => {
+            if (status === window.kakao.maps.services.Status.OK) {
+                const bounds = new window.kakao.maps.LatLngBounds();
+                let hasValidResults = false;
+
+                // 검색 결과들을 포함하는 범위 계산
+                for (let i = 0; i < data.length; i++) {
+                    // 주소 검색 결과가 아닌 일반 장소 검색 결과 중에서도 지역명 필터링 가능
+                    // 여기서는 모든 결과의 범위를 확장
+                    bounds.extend(new window.kakao.maps.LatLng(data[i].y, data[i].x));
+                    hasValidResults = true;
+                }
+
+                if (hasValidResults) {
+                    isProgrammaticMove.current = true;
+                    map.setBounds(bounds);
+
+                    // 사용자가 요청한 대로 줌 레벨을 5로 고정 (주소 이동 시 가독성 확보)
+                    setTimeout(() => {
+                        if (mapRef.current) mapRef.current.setLevel(5);
+                    }, 100);
+                }
+            } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
+                // 장소 검색 결과가 없으면 주소 검색 시도
+                const geocoder = new window.kakao.maps.services.Geocoder();
+                geocoder.addressSearch(searchKeyword, (result: any, status: any) => {
+                    if (status === window.kakao.maps.services.Status.OK) {
+                        const bounds = new window.kakao.maps.LatLngBounds();
+                        result.forEach((res: any) => {
+                            bounds.extend(new window.kakao.maps.LatLng(res.y, res.x));
+                        });
+                        isProgrammaticMove.current = true;
+                        map.setBounds(bounds);
+
+                        // 주소 검색 시에도 줌 레벨을 5로 고정
+                        setTimeout(() => {
+                            if (mapRef.current) mapRef.current.setLevel(5);
+                        }, 100);
+                    }
+                });
+            }
+        });
+    }, [searchKeyword, isSdkLoaded]);
 
     return <div ref={containerRef} style={{ width: "100%", height: "100dvh" }} />;
 }
