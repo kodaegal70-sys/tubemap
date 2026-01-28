@@ -176,7 +176,11 @@ export default function BottomSheet({
                         : `https://m.place.naver.com/search?q=${encodeURIComponent(place.name)}`;
 
                       return (
-                        <div key={place.id} className={`${styles.item} ${styles.itemSelected}`}>
+                        <div
+                          key={place.id}
+                          className={`${styles.item} ${styles.itemSelected}`}
+                          onClick={() => handlePlaceClick(place)}
+                        >
                           <div className={styles.itemImage}>
                             <PlaceImage src={place.image_url} alt={place.name} />
                           </div>
