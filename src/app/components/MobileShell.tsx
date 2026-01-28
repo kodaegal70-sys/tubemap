@@ -131,7 +131,8 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
       } else {
         // 검색 결과가 없으면 Kakao 지오코딩으로 지역 검색
         try {
-          const response = await fetch(
+          // 먼저 주소 검색 시도
+          let response = await fetch(
             `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(keyword)}`,
             {
               headers: {
@@ -139,17 +140,33 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
               },
             }
           );
-          const data = await response.json();
+          let data = await response.json();
+
+          console.log('주소 검색 결과:', data);
+
+          // 주소 검색 결과가 없으면 키워드 검색 시도
+          if (!data.documents || data.documents.length === 0) {
+            response = await fetch(
+              `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(keyword)}`,
+              {
+                headers: {
+                  Authorization: `KakaoAK 4f9be0b1a37f4ccb4512a300a3f067a6`,
+                },
+              }
+            );
+            data = await response.json();
+            console.log('키워드 검색 결과:', data);
+          }
 
           if (data.documents && data.documents.length > 0) {
             const location = data.documents[0];
             // 가상의 Place 객체 생성
             const virtualPlace: Place = {
               id: -1,
-              name: location.address_name || keyword,
+              name: location.address_name || location.place_name || keyword,
               lat: parseFloat(location.y),
               lng: parseFloat(location.x),
-              address: location.address_name,
+              address: location.address_name || location.road_address_name || '',
               category: '기타',
               media: '검색 결과',
               description: `${keyword} 검색 결과`,
@@ -157,6 +174,8 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
               naver_url: '',
               phone: '',
             };
+
+            console.log('가상 Place 생성:', virtualPlace);
 
             // 가상 Place를 리스트에 추가하고 선택
             setPlaces([virtualPlace]);
@@ -169,6 +188,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
         } catch (error) {
           console.error('지오코딩 실패:', error);
           setPlaces([]);
+          alert('검색 중 오류가 발생했습니다.');
         }
       }
     } else {
