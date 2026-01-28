@@ -79,6 +79,8 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  /* [UX] 하단 InfoBar 및 Safe Area를 고려한 여백 확보 */
+  padding-bottom: calc(40px + env(safe-area-inset-bottom) + 60px);
 }
 
 .checkboxItem {

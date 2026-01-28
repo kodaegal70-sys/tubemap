@@ -83,7 +83,7 @@ function DesktopLayout({
               setRightPanelTab('list');
               setFitBoundsTrigger(prev => prev + 1);
             }
-            setActiveCategoryFilters(prev =>
+            (setActiveCategoryFilters as any)(prev =>
               prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
             );
           }}
@@ -115,7 +115,7 @@ function HomeContent() {
   const [allPlaces, setAllPlaces] = useState<Place[]>(DUMMY_PLACES);
   const [activeMediaFilters, setActiveMediaFilters] = useState<string[]>([]);
   const [activeCategoryFilters, setActiveCategoryFilters] = useState<string[]>([]);
-  const [visiblePlaces, setVisiblePlaces] = useState<Place[]>([]);
+  const [visiblePlaces, setVisiblePlaces] = useState<Place[] | null>(null);
   const [focusedPlace, setFocusedPlace] = useState<Place | null>(null);
   const [currentSearch, setCurrentSearch] = useState<string>('');
   const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -167,7 +167,7 @@ function HomeContent() {
     }
 
     // 2) 지도 화면 안에 있는 핀만 리스트에 노출 (개수 1:1 일치)
-    if (visiblePlaces.length > 0) {
+    if (visiblePlaces !== null) {
       const visibleIds = new Set(visiblePlaces.map((p) => p.id));
       return base.filter((p) => visibleIds.has(p.id));
     }

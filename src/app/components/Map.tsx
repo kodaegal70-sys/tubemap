@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Place } from '@/data/places';
 import PlaceImage from './PlaceImage';
 
@@ -76,23 +76,30 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
     }, [isSdkLoaded]);
 
     // 2. Map Initialization & Fixed Logic
-    useEffect(() => {
-        if (!isSdkLoaded) {
-            console.log('SDK not loaded yet');
-            return;
-        }
+    const calculateVisible = useCallback(() => {
+        const map = mapRef.current;
+        if (!map) return;
+        const { places: latestPlaces, onMapMove: latestOnMapMove } = propsRef.current;
+        if (!latestOnMapMove) return;
 
-        // 이미 생성된 맵이 있으면 그대로 사용
+        // [심플] 카카오맵 bounds 기준으로 현재 화면 안의 핀만 계산
+        const bounds = map.getBounds();
+        if (!bounds) return;
+
+        const visible = latestPlaces.filter((p) => {
+            const latlng = new window.kakao.maps.LatLng(p.lat, p.lng);
+            return bounds.contain(latlng);
+        });
+
+        latestOnMapMove(visible);
+    }, []);
+
+    useEffect(() => {
+        if (!isSdkLoaded) return;
         let map = mapRef.current;
 
-        // 초기화되지 않은 경우에만 새로 생성
         if (!map) {
-            if (!containerRef.current) {
-                console.log('Container ref not ready');
-                return;
-            }
-
-            console.log('Initializing map...');
+            if (!containerRef.current) return;
             try {
                 map = new window.kakao.maps.Map(containerRef.current, {
                     center: new window.kakao.maps.LatLng(37.5665, 126.9780),
@@ -100,26 +107,11 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
                 });
                 map.setDraggable(true);
                 mapRef.current = map;
-                console.log('Map initialized successfully');
             } catch (error) {
                 console.error('Failed to initialize map:', error);
                 return;
             }
         }
-
-        const calculateVisible = () => {
-            const { places: latestPlaces, onMapMove: latestOnMapMove } = propsRef.current;
-            if (!latestOnMapMove) return;
-
-            // [심플] 카카오맵 bounds 기준으로 현재 화면 안의 핀만 계산
-            const bounds = map.getBounds();
-            const visible = latestPlaces.filter((p) => {
-                const latlng = new window.kakao.maps.LatLng(p.lat, p.lng);
-                return bounds.contain(latlng);
-            });
-
-            latestOnMapMove(visible);
-        };
 
         const handleIdle = () => {
             calculateVisible();
@@ -142,7 +134,21 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         });
 
         calculateVisible();
-    }, [isSdkLoaded, onMapStateChange]);
+
+        return () => {
+            if (map) {
+                window.kakao.maps.event.removeListener(map, 'idle', handleIdle);
+                // click/dragstart는 간단히 정리하거나 무시 (이벤트가 많지 않으므로)
+            }
+        };
+    }, [isSdkLoaded, onMapStateChange, calculateVisible]);
+
+    // [중요] 필터 등으로 places가 변경되면 지도가 움직이지 않아도 가시성 재계산
+    useEffect(() => {
+        if (isSdkLoaded && mapRef.current) {
+            calculateVisible();
+        }
+    }, [places, isSdkLoaded, calculateVisible]);
 
     // 3. Markers Management
     useEffect(() => {
