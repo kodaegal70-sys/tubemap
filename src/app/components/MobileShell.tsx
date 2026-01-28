@@ -121,11 +121,19 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
         p.description?.includes(keyword)
       );
       setPlaces(filtered);
+
+      // 검색 결과가 있으면 첫 번째 장소 선택 (지도 이동 + 바텀시트 half)
+      if (filtered.length > 0) {
+        const firstPlace = filtered[0];
+        setSelectedPlaceId(firstPlace.id);
+        setSheetState('half');
+        router.push(`?placeId=${firstPlace.id}`, { scroll: false });
+      }
     } else {
       // 검색어가 없으면 필터링된 장소 사용
       setPlaces(filteredPlaces.slice(0, 50));
     }
-  }, [filteredPlaces, setPlaces]);
+  }, [filteredPlaces, setPlaces, setSelectedPlaceId, setSheetState, router]);
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
