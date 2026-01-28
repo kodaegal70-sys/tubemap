@@ -108,7 +108,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   // 포커스 해제 핸들러 (토글용)
   const handleClearFocus = useCallback(() => {
     setSelectedPlaceId(null);
-    setSheetState('peek');
+    setSheetState('half');
     router.replace('/', { scroll: false });
   }, [setSelectedPlaceId, setSheetState, router]);
 
