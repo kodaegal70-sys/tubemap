@@ -113,21 +113,63 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   }, [setSelectedPlaceId, setSheetState, router]);
 
   // 검색 핸들러
-  const handleSearch = useCallback((keyword: string) => {
+  const handleSearch = useCallback(async (keyword: string) => {
     if (keyword.trim()) {
       const filtered = filteredPlaces.filter(p =>
         p.name.includes(keyword) ||
         p.address?.includes(keyword) ||
         p.description?.includes(keyword)
       );
-      setPlaces(filtered);
 
-      // 검색 결과가 있으면 첫 번째 장소 선택 (지도 이동 + 바텀시트 half)
+      // 검색 결과가 있으면 첫 번째 장소 선택
       if (filtered.length > 0) {
+        setPlaces(filtered);
         const firstPlace = filtered[0];
         setSelectedPlaceId(firstPlace.id);
         setSheetState('half');
         router.push(`?placeId=${firstPlace.id}`, { scroll: false });
+      } else {
+        // 검색 결과가 없으면 Kakao 지오코딩으로 지역 검색
+        try {
+          const response = await fetch(
+            `https://dapi.kakao.com/v2/local/search/address.json?query=${encodeURIComponent(keyword)}`,
+            {
+              headers: {
+                Authorization: `KakaoAK 4f9be0b1a37f4ccb4512a300a3f067a6`,
+              },
+            }
+          );
+          const data = await response.json();
+
+          if (data.documents && data.documents.length > 0) {
+            const location = data.documents[0];
+            // 가상의 Place 객체 생성
+            const virtualPlace: Place = {
+              id: -1,
+              name: location.address_name || keyword,
+              lat: parseFloat(location.y),
+              lng: parseFloat(location.x),
+              address: location.address_name,
+              category: '기타',
+              media: '검색 결과',
+              description: `${keyword} 검색 결과`,
+              image_url: '',
+              naver_url: '',
+              phone: '',
+            };
+
+            // 가상 Place를 리스트에 추가하고 선택
+            setPlaces([virtualPlace]);
+            setSelectedPlaceId(virtualPlace.id);
+            setSheetState('half');
+          } else {
+            setPlaces([]);
+            alert('검색 결과가 없습니다.');
+          }
+        } catch (error) {
+          console.error('지오코딩 실패:', error);
+          setPlaces([]);
+        }
       }
     } else {
       // 검색어가 없으면 필터링된 장소 사용
