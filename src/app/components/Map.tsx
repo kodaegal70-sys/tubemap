@@ -267,9 +267,9 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
                     isProgrammaticMove.current = true;
                     map.setBounds(bounds);
 
-                    // 사용자가 요청한 대로 줌 레벨을 5로 고정 (주소 이동 시 가독성 확보)
+                    // 사용자가 요청한 대로 줌 레벨을 7로 고정
                     setTimeout(() => {
-                        if (mapRef.current) mapRef.current.setLevel(5);
+                        if (mapRef.current) mapRef.current.setLevel(7);
                     }, 100);
                 }
             } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
@@ -284,9 +284,9 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
                         isProgrammaticMove.current = true;
                         map.setBounds(bounds);
 
-                        // 주소 검색 시에도 줌 레벨을 5로 고정
+                        // 주소 검색 시에도 줌 레벨을 7로 고정
                         setTimeout(() => {
-                            if (mapRef.current) mapRef.current.setLevel(5);
+                            if (mapRef.current) mapRef.current.setLevel(7);
                         }, 100);
                     }
                 });
