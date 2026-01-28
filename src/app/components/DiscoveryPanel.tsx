@@ -163,26 +163,35 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
                 const count = places.filter(p => p.media.split('|')[0] === media).length;
 
                 return (
-                  <label
-                    key={media}
-                    className={`${styles.checkboxItem} ${selectedMedia.includes(media) ? styles.selected : ''}`}
-                  >
-                    <div className={styles.rank} style={{ color: overallIndex < 3 ? '#FA880B' : '#999' }}>
-                      {overallIndex + 1}
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={selectedMedia.includes(media)}
-                      onChange={() => handleCheckboxChange(media)}
-                      style={{ display: 'none' }}
-                    />
-                    <div className={styles.mediaTitle}>
-                      {media}
-                    </div>
-                    <span className={styles.tag}>
-                      {count}곳
-                    </span>
-                  </label>
+                  <div key={media}>
+                    <label
+                      className={`${styles.checkboxItem} ${selectedMedia.includes(media) ? styles.selected : ''}`}
+                      onClick={() => handleCheckboxChange(media)}
+                    >
+                      <div className={styles.rank} style={{ color: overallIndex < 3 ? '#FA880B' : '#999' }}>
+                        {overallIndex + 1}
+                      </div>
+                      <div className={styles.mediaTitle}>
+                        {media}
+                      </div>
+                      <span className={styles.tag}>
+                        {count}곳
+                      </span>
+                    </label>
+
+                    {/* 선택된 경우 바로 아래에 리스트 보기 버튼 노출 */}
+                    {selectedMedia.includes(media) && (
+                      <button
+                        className={styles.inlineApplyButton}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleApply();
+                        }}
+                      >
+                        리스트 보기
+                      </button>
+                    )}
+                  </div>
                 );
               })}
             </>
@@ -217,15 +226,8 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
         )}
       </div>
 
-      {/* 적용 버튼 */}
-      <div className={styles.actionBar}>
-        <button
-          onClick={handleApply}
-          className={styles.applyButton}
-        >
-          적용
-        </button>
-      </div>
+      {/* 하단 고정 버튼 제거 (항목별 인라인 버튼으로 대체) */}
+
     </div>
   );
 }

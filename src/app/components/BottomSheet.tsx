@@ -127,6 +127,17 @@ export default function BottomSheet({
             {listCount !== null && (
               <span className={styles.countBadge}>{listCount}</span>
             )}
+            {discoveryFilter.selectedMedia.length > 0 && (
+              <button
+                className={styles.resetFilterButton}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDiscoveryFilterChange({ media: [] });
+                }}
+              >
+                토글 해제
+              </button>
+            )}
           </div>
           <div className={styles.handleTabs}>
             <button
@@ -171,9 +182,12 @@ export default function BottomSheet({
                     const mediaProgram = mediaProgramRaw?.trim() || '';
                     const youtubeQuery = `${place.name} ${mediaChannel || ''}`.trim();
                     const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
-                    const naverUrl = place.naver_url && place.naver_url.trim().length > 0
-                      ? place.naver_url
-                      : `https://m.place.naver.com/search?q=${encodeURIComponent(place.name)}`;
+
+                    // 네이버 검색 URL: 업체명 + 지역명(주소 앞 2단어) 조합
+                    const addressParts = place.address ? place.address.split(' ') : [];
+                    const region = addressParts.slice(0, 2).join(' ');
+                    const naverSearchQuery = `${place.name} ${region}`.trim();
+                    const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
 
                     return (
                       <div
@@ -222,7 +236,7 @@ export default function BottomSheet({
                               <span>
                                 네이버
                                 <br />
-                                플레이스
+                                검색
                               </span>
                             </a>
                           </div>

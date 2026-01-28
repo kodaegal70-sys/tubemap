@@ -199,19 +199,34 @@
   background-color: #e9ecef;
 }
 
-.applyButton {
-  flex: 2;
-  padding: 14px;
+.inlineApplyButton {
+  width: calc(100% - 24px);
+  margin: -4px 12px 12px 12px;
+  padding: 10px;
   background-color: #FA880B;
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 0.95rem;
-  font-weight: 600;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
+  box-shadow: 0 4px 12px rgba(250, 136, 11, 0.2);
   transition: all 0.2s;
+  animation: fadeInDown 0.2s ease-out;
 }
 
-.applyButton:hover {
-  background-color: #e67a00;
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inlineApplyButton:active {
+  transform: scale(0.98);
 }

@@ -30,6 +30,17 @@ export default function RightPanel({
       <div className={styles.header}>
         <div className={styles.title}>
           {tab === 'list' ? '리스트' : '디스커버리'}
+          {activeMediaFilters.length > 0 && (
+            <button
+              className={styles.resetFilterButton}
+              onClick={() => {
+                onFilterChange({ media: [] });
+                setTab('list');
+              }}
+            >
+              토글 해제
+            </button>
+          )}
         </div>
         <div className={styles.tabs}>
           <button
@@ -61,10 +72,12 @@ export default function RightPanel({
               const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(
                 youtubeQuery,
               )}`;
-              const naverUrl =
-                focusedPlace.naver_url && focusedPlace.naver_url.trim().length > 0
-                  ? focusedPlace.naver_url
-                  : `https://m.place.naver.com/search?q=${encodeURIComponent(focusedPlace.name)}`;
+
+              // 네이버 검색 URL: 업체명 + 지역명(주소 앞 2단어) 조합
+              const addressParts = focusedPlace.address ? focusedPlace.address.split(' ') : [];
+              const region = addressParts.slice(0, 2).join(' ');
+              const naverSearchQuery = `${focusedPlace.name} ${region}`.trim();
+              const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
 
               return (
                 <div className={styles.detailCard}>
@@ -113,7 +126,7 @@ export default function RightPanel({
                       rel="noreferrer"
                       className={`${styles.detailButton} ${styles.naverButton}`}
                     >
-                      네이버 플레이스
+                      네이버 검색
                     </a>
                   </div>
                 </div>
@@ -160,7 +173,12 @@ export default function RightPanel({
           <div className={styles.discoveryWrapper}>
             <FilterPanel
               places={allPlaces}
-              onFilterChange={onFilterChange}
+              onFilterChange={(filters) => {
+                onFilterChange(filters);
+                if (filters.media.length > 0) {
+                  setTab('list');
+                }
+              }}
               selectedMediaFilters={activeMediaFilters}
               isMobileMode={true}
             />

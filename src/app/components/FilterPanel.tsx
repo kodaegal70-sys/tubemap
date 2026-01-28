@@ -111,14 +111,16 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
     const handleCheckboxChange = (media: string) => {
         let newSelected: string[];
         if (selectedMedia.includes(media)) {
-            // 이미 선택된 것을 클릭하면 해제
             newSelected = [];
         } else {
-            // 다른 걸 클릭하면 기존 것 무시하고 새로 선택 (단일 선택)
             newSelected = [media];
         }
         setSelectedMedia(newSelected);
-        onFilterChange({ media: newSelected });
+        // [MOD] 즉시 필터링하지 않고 '리스트 보기' 버튼 클릭 시에만 필터링하도록 변경
+    };
+
+    const handleApply = (media: string) => {
+        onFilterChange({ media: [media] });
     };
 
     const handleReset = () => {
@@ -185,26 +187,35 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
                                 const count = places.filter(p => p.media.split('|')[0] === media).length;
 
                                 return (
-                                    <label
-                                        key={media}
-                                        className={`${styles.checkboxParams} ${selectedMedia.includes(media) ? styles.selected : ''}`}
-                                    >
-                                        <div className={styles.rank} style={{ color: overallIndex < 3 ? '#FA880B' : '#999' }}>
-                                            {overallIndex + 1}
-                                        </div>
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedMedia.includes(media)}
-                                            onChange={() => handleCheckboxChange(media)}
-                                            style={{ display: 'none' }}
-                                        />
-                                        <div className={styles.mediaTitle}>
-                                            {media}
-                                        </div>
-                                        <span className={styles.tag}>
-                                            {count}곳
-                                        </span>
-                                    </label>
+                                    <div key={media}>
+                                        <label
+                                            className={`${styles.checkboxParams} ${selectedMedia.includes(media) ? styles.selected : ''}`}
+                                            onClick={() => handleCheckboxChange(media)}
+                                        >
+                                            <div className={styles.rank} style={{ color: overallIndex < 3 ? '#FA880B' : '#999' }}>
+                                                {overallIndex + 1}
+                                            </div>
+                                            <div className={styles.mediaTitle}>
+                                                {media}
+                                            </div>
+                                            <span className={styles.tag}>
+                                                {count}곳
+                                            </span>
+                                        </label>
+
+                                        {/* 선택된 경우 바로 아래에 리스트 보기 버튼 노출 */}
+                                        {selectedMedia.includes(media) && (
+                                            <button
+                                                className={styles.inlineApplyButton}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleApply(media);
+                                                }}
+                                            >
+                                                리스트 보기
+                                            </button>
+                                        )}
+                                    </div>
                                 );
                             })}
                         </>
@@ -241,8 +252,6 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
                 </div>
             )}
 
-            {/* 광고 영역 (최하단) */}
-            <AdSlot type="FILTER" id="filter-ad-1" />
         </div>
     );
 }
