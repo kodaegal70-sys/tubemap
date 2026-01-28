@@ -4,7 +4,7 @@ import { useEffect, useMemo, useCallback, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useMobile, DiscoveryFilter } from '../contexts/MobileContext';
-import { Place } from '@/data/places';
+import { Place, DUMMY_PLACES, checkCategoryMatch } from '@/data/places';
 import TopSearchBar from './TopSearchBar';
 import BottomSheet from './BottomSheet';
 
@@ -61,8 +61,8 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   // 필터링된 장소 계산
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
-      // 카테고리 필터
-      const catMatch = categoryFilter.length === 0 || categoryFilter.includes(p.category || '기타');
+      // 카테고리 필터 (보완된 유틸리티 사용)
+      const catMatch = checkCategoryMatch(p.category, categoryFilter);
 
       // 디스커버리 필터 (미디어)
       const mediaMatch = discoveryFilter.selectedMedia.length === 0 ||
@@ -170,12 +170,19 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
-    setCategoryFilter(prev =>
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  }, [setCategoryFilter]);
+    setCategoryFilter(prev => {
+      const isSelecting = !prev.includes(category);
+      if (isSelecting) {
+        // [UX] 카테고리 선택 시 자동으로 리스트 탭으로 전환
+        setSheetTab('list');
+        setSheetState('half');
+        setFitBoundsTrigger(prev => prev + 1); // [UX] 지도 영역 자동 조정
+      }
+      return isSelecting
+        ? [...prev, category]
+        : prev.filter(c => c !== category);
+    });
+  }, [setCategoryFilter, setSheetTab, setSheetState]);
 
   // 디스커버리 필터 변경
   const handleDiscoveryFilterChange = useCallback((filters: { media: string[] }) => {

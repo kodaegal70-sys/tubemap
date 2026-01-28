@@ -1,3 +1,32 @@
+// 세부 카테고리를 상위 카테고리로 매칭하는 맵
+export const CATEGORY_MAP: Record<string, string[]> = {
+    '한식': ['한식', '냉면', '불고기', '비빔밥', '찜', '탕', '찌개', '고기', '곱창', '막창', '해장국', '국밥', '백반', '정식', '족발', '보쌈', '삼겹살', '고깃집'],
+    '중식': ['중식', '중국집', '짜장면', '짬뽕', '마라탕', '양꼬치', '딤섬'],
+    '일식': ['일식', '초밥', '스시', '돈가스', '우동', '라멘', '이자카야', '회', '횟집', '소바'],
+    '양식': ['양식', '이탈리안', '프렌치', '스테이크', '파스타', '피자', '햄버거', '레스토랑'],
+    '분식': ['분식', '떡볶이', '김밥', '라면'],
+    '기타': ['카페', '디저트', '베이커리', '술집', '포차', '치킨', '패스트푸드', '동남아', '베트남', '태국', '인도', '멕시칸']
+};
+
+/**
+ * 특정 장소의 세부 카테고리가 선택된 상위 카테고리 필터에 포함되는지 확인
+ */
+export const checkCategoryMatch = (placeCategory: string | undefined, filterCategories: string[]) => {
+    if (filterCategories.length === 0) return true;
+    if (!placeCategory) return filterCategories.includes('기타');
+
+    return filterCategories.some(filterCat => {
+        // 1. 직접 일치 (예: '한식' === '한식')
+        if (placeCategory === filterCat) return true;
+
+        // 2. 매핑 리스트에 포함되는지 확인 (예: '냉면'이 '한식' 리스트에 있는지)
+        const subCats = CATEGORY_MAP[filterCat];
+        if (subCats && subCats.some(sub => placeCategory.includes(sub))) return true;
+
+        return false;
+    });
+};
+
 export interface Place {
     id: number;
     name: string;

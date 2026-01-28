@@ -13,6 +13,8 @@ type Props = {
   onPlaceClick: (p: Place) => void;
   onFilterChange: (filters: { media: string[] }) => void;
   focusedPlace: Place | null;
+  tab?: 'list' | 'discovery'; // 외부 제어용 추가
+  onTabChange?: (tab: 'list' | 'discovery') => void; // 외부 제어용 추가
 };
 
 export default function RightPanel({
@@ -22,20 +24,31 @@ export default function RightPanel({
   onPlaceClick,
   onFilterChange,
   focusedPlace,
+  tab: controlledTab,
+  onTabChange,
 }: Props) {
-  const [tab, setTab] = useState<'list' | 'discovery'>('list');
+  const [internalTab, setInternalTab] = useState<'list' | 'discovery'>('list');
+  const activeTab = controlledTab || internalTab;
+
+  const handleTabChange = (newTab: 'list' | 'discovery') => {
+    if (onTabChange) {
+      onTabChange(newTab);
+    } else {
+      setInternalTab(newTab);
+    }
+  };
 
   return (
     <aside className={styles.rightPanel}>
       <div className={styles.header}>
         <div className={styles.title}>
-          {tab === 'list' ? '리스트' : '디스커버리'}
+          {activeTab === 'list' ? '리스트' : '디스커버리'}
           {activeMediaFilters.length > 0 && (
             <button
               className={styles.resetFilterButton}
               onClick={() => {
                 onFilterChange({ media: [] });
-                setTab('list');
+                handleTabChange('list');
               }}
             >
               토글 해제
@@ -45,15 +58,15 @@ export default function RightPanel({
         <div className={styles.tabs}>
           <button
             type="button"
-            className={`${styles.tabButton} ${tab === 'list' ? styles.tabActive : ''}`}
-            onClick={() => setTab('list')}
+            className={`${styles.tabButton} ${activeTab === 'list' ? styles.tabActive : ''}`}
+            onClick={() => handleTabChange('list')}
           >
             리스트
           </button>
           <button
             type="button"
-            className={`${styles.tabButton} ${tab === 'discovery' ? styles.tabActive : ''}`}
-            onClick={() => setTab('discovery')}
+            className={`${styles.tabButton} ${activeTab === 'discovery' ? styles.tabActive : ''}`}
+            onClick={() => handleTabChange('discovery')}
           >
             디스커버리
           </button>
@@ -61,7 +74,7 @@ export default function RightPanel({
       </div>
 
       <div className={styles.content}>
-        {tab === 'list' ? (
+        {activeTab === 'list' ? (
           <>
             {/* 상세 카드 (핀/리스트 선택 시) */}
             {focusedPlace && (() => {
@@ -176,7 +189,7 @@ export default function RightPanel({
               onFilterChange={(filters) => {
                 onFilterChange(filters);
                 if (filters.media.length > 0) {
-                  setTab('list');
+                  handleTabChange('list');
                 }
               }}
               selectedMediaFilters={activeMediaFilters}

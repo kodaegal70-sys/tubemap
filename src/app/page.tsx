@@ -9,7 +9,7 @@ import RightPanel from './components/RightPanel';
 import MobileShell from './components/MobileShell';
 import InfoBar from './components/InfoBar';
 import { supabase } from '@/lib/supabaseClient';
-import { Place, DUMMY_PLACES } from '@/data/places';
+import { Place, DUMMY_PLACES, checkCategoryMatch } from '@/data/places';
 
 const MapComponent = dynamic(() => import('./components/Map'), { ssr: false });
 
@@ -33,6 +33,8 @@ function DesktopLayout({
   searchKeyword,
   handleSearch,
   onMyLocation,
+  rightPanelTab,
+  setRightPanelTab,
 }: {
   allPlaces: Place[];
   filteredPlaces: Place[];
@@ -49,10 +51,12 @@ function DesktopLayout({
   setActiveCategoryFilters: (categories: string[]) => void;
   setCurrentSearch: (search: string) => void;
   handleSearch: (search: string) => void;
-  setFitBoundsTrigger: (trigger: number) => void;
+  setFitBoundsTrigger: (trigger: number | ((prev: number) => number)) => void;
   myLocation: { lat: number; lng: number } | null;
   searchKeyword: string;
   onMyLocation: () => void;
+  rightPanelTab: 'list' | 'discovery';
+  setRightPanelTab: (tab: 'list' | 'discovery') => void;
 }) {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -74,6 +78,11 @@ function DesktopLayout({
         <TopSearchBar
           onSearch={handleSearch}
           onCategoryToggle={(c: string) => {
+            const isSelecting = !activeCategoryFilters.includes(c);
+            if (isSelecting) {
+              setRightPanelTab('list'); // [UX] 카테고리 선택 시 자동으로 리스트 탭으로 전환
+              setFitBoundsTrigger(prev => prev + 1); // [UX] 지도 영역 자동 조정
+            }
             const updater = (prev: string[]) => {
               return prev.includes(c)
                 ? prev.filter((x: string) => x !== c)
@@ -94,6 +103,8 @@ function DesktopLayout({
         onPlaceClick={handleMarkerClick}
         onFilterChange={handleFilterChange}
         focusedPlace={focusedPlace}
+        tab={rightPanelTab}
+        onTabChange={setRightPanelTab}
       />
     </div>
   );
@@ -115,6 +126,7 @@ function HomeContent() {
   const [mounted, setMounted] = useState(false);
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [rightPanelTab, setRightPanelTab] = useState<'list' | 'discovery'>('list');
 
   useEffect(() => {
     setMounted(true);
@@ -143,7 +155,7 @@ function HomeContent() {
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
       const mediaMatch = activeMediaFilters.length === 0 || activeMediaFilters.includes(p.media.split('|')[0]?.trim());
-      const catMatch = activeCategoryFilters.length === 0 || activeCategoryFilters.includes(p.category || '기타');
+      const catMatch = checkCategoryMatch(p.category, activeCategoryFilters);
       return mediaMatch && catMatch;
     });
   }, [allPlaces, activeMediaFilters, activeCategoryFilters]);
@@ -280,6 +292,8 @@ function HomeContent() {
               myLocation={myLocation}
               searchKeyword={searchKeyword}
               onMyLocation={handleMyLocation}
+              rightPanelTab={rightPanelTab}
+              setRightPanelTab={setRightPanelTab}
             />
           </div>
         )}
