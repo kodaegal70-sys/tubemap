@@ -170,19 +170,21 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
-    setCategoryFilter(prev => {
-      const isSelecting = !prev.includes(category);
-      if (isSelecting) {
-        // [UX] 카테고리 선택 시 자동으로 리스트 탭으로 전환
-        setSheetTab('list');
-        setSheetState('half');
-        setFitBoundsTrigger(prev => prev + 1); // [UX] 지도 영역 자동 조정
-      }
-      return isSelecting
-        ? [...prev, category]
-        : prev.filter(c => c !== category);
-    });
-  }, [setCategoryFilter, setSheetTab, setSheetState]);
+    const isSelecting = !categoryFilter.includes(category);
+
+    if (isSelecting) {
+      // [UX] 카테고리 선택 시 자동으로 리스트 탭으로 전환 (순수 함수 밖에서 실행)
+      setSheetTab('list');
+      setSheetState('half');
+      setFitBoundsTrigger(prev => prev + 1);
+    }
+
+    setCategoryFilter(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  }, [categoryFilter, setCategoryFilter, setSheetTab, setSheetState, setFitBoundsTrigger]);
 
   // 디스커버리 필터 변경
   const handleDiscoveryFilterChange = useCallback((filters: { media: string[] }) => {

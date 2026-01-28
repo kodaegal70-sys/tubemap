@@ -80,15 +80,12 @@ function DesktopLayout({
           onCategoryToggle={(c: string) => {
             const isSelecting = !activeCategoryFilters.includes(c);
             if (isSelecting) {
-              setRightPanelTab('list'); // [UX] 카테고리 선택 시 자동으로 리스트 탭으로 전환
-              setFitBoundsTrigger(prev => prev + 1); // [UX] 지도 영역 자동 조정
+              setRightPanelTab('list');
+              setFitBoundsTrigger(prev => prev + 1);
             }
-            const updater = (prev: string[]) => {
-              return prev.includes(c)
-                ? prev.filter((x: string) => x !== c)
-                : [...prev, c];
-            };
-            (setActiveCategoryFilters as any)(updater);
+            setActiveCategoryFilters(prev =>
+              prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
+            );
           }}
           selectedCategories={activeCategoryFilters}
           onMyLocation={onMyLocation}

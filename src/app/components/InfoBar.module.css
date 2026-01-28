@@ -3,7 +3,8 @@
   bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1200;
+  z-index: 3500;
+  /* BottomSheet(2000)보다 높게 설정 */
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -15,10 +16,10 @@
   color: #fff;
 }
 
-/* 모바일에서 숨김 */
+/* 모바일 노출 활성화 */
 @media (max-width: 768px) {
   .bar {
-    display: none;
+    display: inline-flex;
   }
 }
 
@@ -54,7 +55,8 @@
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
-  z-index: 1300;
+  z-index: 4000;
+  /* Bar(3500)보다 더 높게 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -120,12 +122,35 @@
 
 @media (max-width: 768px) {
   .bar {
-    bottom: 8px;
-    padding: 8px 14px;
-    font-size: 12px;
+    display: inline-flex;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    padding: 5px 14px;
+    /* 훨씬 슬림해진 세로 패딩 */
+    font-size: 11px;
+    /* 텍스트 크기 소폭 축소 */
+    gap: 6px;
+    /* 아이템 사이 간격 축소 */
+    white-space: nowrap;
+    /* 무조건 가로로 한 줄 유지 */
+    width: auto;
+    max-width: 95vw;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    /* 그림자도 가볍게 */
+  }
+
+  .barLabel {
+    font-size: 11px;
   }
 
   .linkButton {
-    font-size: 11px;
+    padding: 2px 8px;
+    /* 버튼도 더 얇게 */
+    font-size: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    /* 더 투명하게 */
+  }
+
+  .divider {
+    opacity: 0.5;
   }
 }

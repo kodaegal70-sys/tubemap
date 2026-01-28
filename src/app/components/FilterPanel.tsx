@@ -44,7 +44,7 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
 
         places.forEach(p => {
             const parts = p.media.split('|');
-            const raw = parts[0].trim();
+            const raw = parts[0]?.trim(); // 안전하게 trim 적용
             if (!raw) return;
 
             counts[raw] = (counts[raw] || 0) + 1;
@@ -120,7 +120,7 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
     };
 
     const handleApply = (media: string) => {
-        onFilterChange({ media: [media] });
+        onFilterChange({ media: [media.trim()] });
     };
 
     const handleReset = () => {
@@ -184,7 +184,10 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
                         <>
                             {paginatedMediaList.map((media, index) => {
                                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
-                                const count = places.filter(p => p.media.split('|')[0] === media).length;
+                                const count = places.filter(p => {
+                                    const mediaName = p.media.split('|')[0]?.trim();
+                                    return mediaName === media;
+                                }).length;
 
                                 return (
                                     <div key={media}>

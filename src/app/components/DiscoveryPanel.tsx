@@ -45,7 +45,7 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
 
     places.forEach(p => {
       const parts = p.media.split('|');
-      const raw = parts[0].trim();
+      const raw = parts[0]?.trim(); // 안전하게 trim 적용
       if (!raw) return;
 
       counts[raw] = (counts[raw] || 0) + 1;
@@ -105,11 +105,8 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
     setSelectedMedia(newSelected);
   };
 
-  const handleApply = () => {
-    onDiscoveryFilterChange({ media: selectedMedia });
-    // 적용 후 discoveryFilter.tab도 업데이트해야 하지만, 
-    // 현재 구조상 onDiscoveryFilterChange는 media만 받으므로
-    // MobileShell에서 처리하도록 함
+  const handleApply = (media: string) => {
+    onDiscoveryFilterChange({ media: [media] }); // 선택된 미디어를 명시적으로 전달
   };
 
   const handleReset = () => {
@@ -160,7 +157,10 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
             <>
               {paginatedMediaList.map((media, index) => {
                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
-                const count = places.filter(p => p.media.split('|')[0] === media).length;
+                const count = places.filter(p => {
+                  const mediaName = p.media.split('|')[0]?.trim();
+                  return mediaName === media;
+                }).length;
 
                 return (
                   <div key={media}>
@@ -185,7 +185,7 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
                         className={styles.inlineApplyButton}
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleApply();
+                          handleApply(media); // 현재 루프의 media를 직접 전달
                         }}
                       >
                         리스트 보기

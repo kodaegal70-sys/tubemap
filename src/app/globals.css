@@ -4,7 +4,8 @@
   --safe-area-inset-top: env(safe-area-inset-top, 0px);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
   --sidebar-width: 400px;
-  --bottom-sheet-peek: 100px;
+  --bottom-sheet-peek: 144px;
+  /* InfoBar(약 40px)를 고려하여 100px -> 144px로 상향 */
   --bottom-sheet-half: 50dvh;
   --bottom-sheet-full: 90dvh;
 }
