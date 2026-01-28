@@ -115,13 +115,24 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   // 검색 핸들러
   const handleSearch = useCallback((keyword: string) => {
     if (keyword.trim()) {
-      const filtered = filteredPlaces.filter(p => p.name.includes(keyword));
+      const filtered = filteredPlaces.filter(p =>
+        p.name.includes(keyword) ||
+        p.address?.includes(keyword) ||
+        p.description?.includes(keyword)
+      );
       setPlaces(filtered);
+
+      // 검색 결과가 있으면 첫 번째 장소로 지도 이동
+      if (filtered.length > 0 && mapRef) {
+        const firstPlace = filtered[0];
+        mapRef.setCenter({ lat: firstPlace.lat, lng: firstPlace.lng });
+        mapRef.setZoom(15);
+      }
     } else {
       // 검색어가 없으면 필터링된 장소 사용
       setPlaces(filteredPlaces.slice(0, 50));
     }
-  }, [filteredPlaces, setPlaces]);
+  }, [filteredPlaces, setPlaces, mapRef]);
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
