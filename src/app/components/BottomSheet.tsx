@@ -19,6 +19,7 @@ interface Props {
   };
   onDiscoveryFilterChange: (filters: { media: string[] }) => void;
   onStateChange?: (state: 'peek' | 'half' | 'full') => void;
+  onClearFocus?: () => void;
 }
 
 export default function BottomSheet({
@@ -29,12 +30,15 @@ export default function BottomSheet({
   discoveryFilter,
   onDiscoveryFilterChange,
   onStateChange,
+  onClearFocus,
 }: Props) {
   // 상세카드 토글 핸들러
   const handlePlaceClick = (place: Place) => {
     if (focusedPlace?.id === place.id) {
       // 같은 장소 재클릭 시 리스트로 복귀
-      onPlaceClick(null as any);
+      if (onClearFocus) {
+        onClearFocus();
+      }
     } else {
       onPlaceClick(place);
     }

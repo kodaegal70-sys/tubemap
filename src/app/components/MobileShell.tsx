@@ -110,6 +110,13 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
     router.push(`?placeId=${place.id}`, { scroll: false });
   }, [setSelectedPlaceId, setSheetState, router]);
 
+  // 포커스 해제 핸들러 (토글용)
+  const handleClearFocus = useCallback(() => {
+    setSelectedPlaceId(null);
+    setSheetState('peek');
+    router.replace('/', { scroll: false });
+  }, [setSelectedPlaceId, setSheetState, router]);
+
   // 검색 핸들러
   const handleSearch = useCallback((keyword: string) => {
     if (keyword.trim()) {
@@ -201,6 +208,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
         discoveryFilter={discoveryFilter}
         onDiscoveryFilterChange={handleDiscoveryFilterChange}
         onStateChange={handleSheetStateChange}
+        onClearFocus={handleClearFocus}
       />
     </div>
   );
