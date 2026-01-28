@@ -15,6 +15,13 @@
   color: #fff;
 }
 
+/* 모바일에서 숨김 */
+@media (max-width: 768px) {
+  .bar {
+    display: none;
+  }
+}
+
 .barLabel {
   font-weight: 700;
   font-size: 13px;
@@ -122,4 +129,3 @@
     font-size: 11px;
   }
 }
-

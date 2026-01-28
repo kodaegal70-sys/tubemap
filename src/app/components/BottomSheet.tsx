@@ -30,6 +30,15 @@ export default function BottomSheet({
   onDiscoveryFilterChange,
   onStateChange,
 }: Props) {
+  // 상세카드 토글 핸들러
+  const handlePlaceClick = (place: Place) => {
+    if (focusedPlace?.id === place.id) {
+      // 같은 장소 재클릭 시 리스트로 복귀
+      onPlaceClick(null as any);
+    } else {
+      onPlaceClick(place);
+    }
+  };
   const focusedPlaceId = focusedPlace?.id;
   const { sheetState, setSheetState, sheetTab, setSheetTab } = useMobile();
   const sheetRef = useRef<HTMLDivElement>(null);
@@ -217,8 +226,8 @@ export default function BottomSheet({
                     return (
                       <div
                         key={place.id}
-                        className={styles.item}
-                        onClick={() => onPlaceClick(place)}
+                        className={styles.placeCard}
+                        onClick={() => handlePlaceClick(place)}
                       >
                         <div className={styles.itemImage}>
                           <PlaceImage src={place.image_url} alt={place.name} />
@@ -304,22 +313,6 @@ export default function BottomSheet({
               </div>
             </div>
           )}
-        </div>
-
-        {/* 하단 고정 탭바 */}
-        <div className={styles.tabBar}>
-          <button
-            className={`${styles.tabButton} ${sheetTab === 'list' ? styles.activeTab : ''}`}
-            onClick={() => setSheetTab('list')}
-          >
-            리스트
-          </button>
-          <button
-            className={`${styles.tabButton} ${sheetTab === 'discovery' ? styles.activeTab : ''}`}
-            onClick={() => setSheetTab('discovery')}
-          >
-            디스커버리
-          </button>
         </div>
 
         {/* 정보 패널 모달 */}
