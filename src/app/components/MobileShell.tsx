@@ -70,15 +70,10 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   const handleMapMove = useCallback((visible: Place[]) => {
     // 지도에 보이는 장소를 places에 설정 (리스트 탭일 때만)
     if (sheetTab === 'list') {
-      if (visible.length > 0) {
-        setPlaces(visible);
-      } else {
-        // 보이는 장소가 없으면 필터링된 장소 중 일부 표시
-        setPlaces(filteredPlaces.slice(0, 50));
-      }
+      setPlaces(visible);
     }
     onMapMove(visible);
-  }, [setPlaces, onMapMove, sheetTab, filteredPlaces]);
+  }, [setPlaces, onMapMove, sheetTab]);
 
   // 필터 변경 시 places 업데이트 (리스트 탭일 때만)
   useEffect(() => {

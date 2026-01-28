@@ -230,7 +230,7 @@ export default function BottomSheet({
                     return (
                       <div
                         key={place.id}
-                        className={styles.placeCard}
+                        className={styles.item}
                         onClick={() => handlePlaceClick(place)}
                       >
                         <div className={styles.itemImage}>
