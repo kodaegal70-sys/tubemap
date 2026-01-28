@@ -43,15 +43,20 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   useEffect(() => {
     if (!placeIdParam) {
       setSelectedPlaceId(null);
-      setSheetState('peek');
+      // [FIX] 업체 선택 해제 시 시트 상태를 강제로 'peek'으로 바꾸지 않음.
+      // 사용자가 보고 있던 'half'나 'full' 높이를 유지하도록 함.
     } else if (allPlaces.length > 0) {
       const p = allPlaces.find(pl => pl.id.toString() === placeIdParam);
       if (p) {
         setSelectedPlaceId(p.id);
-        setSheetState('half');
+        // 업체가 선택될 때 'peek' 상태라면 최소 'half'까지는 올려줌 (UX)
+        if (sheetState === 'peek') {
+          setSheetState('half');
+        }
       }
     }
   }, [placeIdParam, allPlaces, setSelectedPlaceId, setSheetState]);
+  const [fitBoundsTrigger, setFitBoundsTrigger] = useState(0);
 
   // 필터링된 장소 계산
   const filteredPlaces = useMemo(() => {
@@ -61,7 +66,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
 
       // 디스커버리 필터 (미디어)
       const mediaMatch = discoveryFilter.selectedMedia.length === 0 ||
-        discoveryFilter.selectedMedia.includes(p.media.split('|')[0]);
+        discoveryFilter.selectedMedia.includes(p.media.split('|')[0]?.trim());
 
       return catMatch && mediaMatch;
     });
@@ -109,37 +114,59 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   // 포커스 해제 핸들러 (토글용)
   const handleClearFocus = useCallback(() => {
     setSelectedPlaceId(null);
-    setSheetState('half');
     router.replace('/', { scroll: false });
-  }, [setSelectedPlaceId, setSheetState, router]);
+  }, [setSelectedPlaceId, router]);
 
   // 검색 핸들러
   const handleSearch = useCallback((keyword: string) => {
     const trimmed = keyword.trim();
     if (trimmed) {
-      // 1) 로컬 맛집 필터링 (리스트 탭에 즉시 반영)
-      const filtered = filteredPlaces.filter(p =>
-        p.name.includes(trimmed) ||
-        p.address?.includes(trimmed) ||
-        p.description?.includes(trimmed)
+      // 1) 전체 데이터(allPlaces)에서 업체명 우선 필터링
+      const nameMatches = allPlaces.filter(p => p.name.includes(trimmed));
+      const otherMatches = allPlaces.filter(p =>
+        !p.name.includes(trimmed) &&
+        (p.address?.includes(trimmed) || p.description?.includes(trimmed))
       );
 
-      // 검색 결과가 있으면 리스트 업데이트
-      if (filtered.length > 0) {
-        setPlaces(filtered);
+      const allResults = [...nameMatches, ...otherMatches];
+
+      if (nameMatches.length > 0) {
+        // 업체명 매칭이 있으면 해당 리스트를 보여주고 최적의 업체 자동 선택
+        setPlaces(allResults);
+
+        const bestMatch = [...nameMatches].sort((a, b) => {
+          if (a.name === trimmed) return -1;
+          if (b.name === trimmed) return 1;
+          return a.name.length - b.name.length;
+        })[0];
+
+        setSelectedPlaceId(bestMatch.id);
+        router.push(`?placeId=${bestMatch.id}`, { scroll: false });
+
+        // [중요] 업체가 발견되었으므로 지도의 "지역/외부 검색(searchKeyword)"은 수행하지 않음 (간섭 차단)
+        setSearchKeyword('');
+      } else {
+        // 업체명 일치가 없는 경우 (지역 검색 혹은 주소 검색)
+        if (otherMatches.length > 0) {
+          setPlaces(allResults);
+        } else {
+          setPlaces([]);
+        }
+
+        // [중요] 지역 검색을 위해 기존 선택된 업체 해제 및 키워드 설정
+        setSelectedPlaceId(null);
+        setSearchKeyword(trimmed);
       }
 
-      // 2) 지도 이동을 위한 검색어 상태 업데이트
-      setSearchKeyword(trimmed);
-
-      // 3) 모바일 UX: 검색 시 바텀시트를 half로 변경하여 지도와 리스트를 동시에 보게 함
       setSheetState('half');
     } else {
-      // 검색어가 없으면 필터링된 장소 초기화
+      // 검색어가 없으면 초기화
       setPlaces(filteredPlaces.slice(0, 50));
       setSearchKeyword('');
+      setSelectedPlaceId(null);
+      router.replace('/', { scroll: false });
     }
-  }, [filteredPlaces, setPlaces, setSheetState, setSearchKeyword]);
+  }, [allPlaces, filteredPlaces, setPlaces, setSelectedPlaceId, setSheetState, setSearchKeyword, router]);
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
@@ -159,6 +186,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
     // 적용 후 BottomSheet를 half로 변경하고 리스트 탭으로 전환
     setSheetState('half');
     setSheetTab('list');
+    setFitBoundsTrigger(prev => prev + 1); // 지도 영역 자동 조정 트리거
   }, [setDiscoveryFilter, setSheetState, setSheetTab]);
 
   const handleSheetStateChange = useCallback((state: 'peek' | 'half' | 'full') => {
@@ -197,9 +225,9 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
         places={filteredPlaces}
         focusedPlace={focusedPlace}
         onMapMove={handleMapMove}
-        onManualInteraction={onManualInteraction}
         onMarkerClick={handleMarkerClick}
-        fitBoundsTrigger={0}
+        onManualInteraction={onManualInteraction}
+        fitBoundsTrigger={fitBoundsTrigger}
         isMobile={true}
         mobileSheetState={sheetState}
         myLocation={myLocation}

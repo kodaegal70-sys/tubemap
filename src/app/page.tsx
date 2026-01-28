@@ -30,6 +30,8 @@ function DesktopLayout({
   setCurrentSearch,
   setFitBoundsTrigger,
   myLocation,
+  searchKeyword,
+  handleSearch,
   onMyLocation,
 }: {
   allPlaces: Place[];
@@ -46,8 +48,10 @@ function DesktopLayout({
   handleFilterChange: (filters: { media: string[] }) => void;
   setActiveCategoryFilters: (categories: string[]) => void;
   setCurrentSearch: (search: string) => void;
+  handleSearch: (search: string) => void;
   setFitBoundsTrigger: (trigger: number) => void;
   myLocation: { lat: number; lng: number } | null;
+  searchKeyword: string;
   onMyLocation: () => void;
 }) {
   return (
@@ -62,12 +66,13 @@ function DesktopLayout({
         fitBoundsTrigger={fitBoundsTrigger}
         isMobile={false}
         myLocation={myLocation}
+        searchKeyword={searchKeyword}
       />
 
       {/* 좌측 상단 플로팅 검색/카테고리 (직방식 상단 패널) */}
       <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 1100 }}>
         <TopSearchBar
-          onSearch={setCurrentSearch}
+          onSearch={handleSearch}
           onCategoryToggle={(c: string) => {
             const updater = (prev: string[]) => {
               return prev.includes(c)
@@ -105,6 +110,7 @@ function HomeContent() {
   const [visiblePlaces, setVisiblePlaces] = useState<Place[]>([]);
   const [focusedPlace, setFocusedPlace] = useState<Place | null>(null);
   const [currentSearch, setCurrentSearch] = useState<string>('');
+  const [searchKeyword, setSearchKeyword] = useState<string>('');
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
@@ -136,7 +142,7 @@ function HomeContent() {
   // [FILTER] 마커 표시용 필터링
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
-      const mediaMatch = activeMediaFilters.length === 0 || activeMediaFilters.includes(p.media.split('|')[0]);
+      const mediaMatch = activeMediaFilters.length === 0 || activeMediaFilters.includes(p.media.split('|')[0]?.trim());
       const catMatch = activeCategoryFilters.length === 0 || activeCategoryFilters.includes(p.category || '기타');
       return mediaMatch && catMatch;
     });
@@ -165,6 +171,46 @@ function HomeContent() {
     setVisiblePlaces(visible);
   }, []);
 
+  // 스마트 검색 핸들러 (모바일과 동일한 로직)
+  const handleSearch = useCallback((keyword: string) => {
+    const trimmed = keyword.trim();
+    if (trimmed) {
+      // 1) 전체 데이터(allPlaces)에서 업체명 우선 필터링
+      const nameMatches = allPlaces.filter(p => p.name.includes(trimmed));
+      const otherMatches = allPlaces.filter(p =>
+        !p.name.includes(trimmed) &&
+        (p.address?.includes(trimmed) || p.description?.includes(trimmed))
+      );
+
+      const allResults = [...nameMatches, ...otherMatches];
+
+      if (nameMatches.length > 0) {
+        // 업체명 매칭이 있으면 해당 리스트 필터 적용 및 최적의 업체 자동 선택
+        setCurrentSearch(trimmed);
+
+        const bestMatch = [...nameMatches].sort((a, b) => {
+          if (a.name === trimmed) return -1;
+          if (b.name === trimmed) return 1;
+          return a.name.length - b.name.length;
+        })[0];
+
+        router.push(`?placeId=${bestMatch.id}`, { scroll: false });
+
+        // 업체가 발견되었으므로 지도의 "지역/외부 검색(searchKeyword)"은 수행하지 않음
+        setSearchKeyword('');
+      } else {
+        // 업체명 일치가 없는 경우 (지역 검색 혹은 주소 검색)
+        setCurrentSearch(trimmed);
+        setSearchKeyword(trimmed);
+      }
+    } else {
+      // 검색어가 없으면 초기화
+      setCurrentSearch('');
+      setSearchKeyword('');
+      router.replace('/', { scroll: false });
+    }
+  }, [allPlaces, router]);
+
   // [INTERACTION] 수동 조작 시 즉시 상세 해제
   const handleManualInteraction = useCallback(() => {
     if (placeIdParam) {
@@ -178,6 +224,9 @@ function HomeContent() {
 
   const handleFilterChange = (filters: { media: string[] }) => {
     setActiveMediaFilters(filters.media);
+    if (filters.media.length > 0) {
+      setFitBoundsTrigger(prev => prev + 1);
+    }
   };
 
   const handleMyLocation = useCallback(() => {
@@ -226,8 +275,10 @@ function HomeContent() {
               handleFilterChange={handleFilterChange}
               setActiveCategoryFilters={setActiveCategoryFilters}
               setCurrentSearch={setCurrentSearch}
+              handleSearch={handleSearch}
               setFitBoundsTrigger={setFitBoundsTrigger}
               myLocation={myLocation}
+              searchKeyword={searchKeyword}
               onMyLocation={handleMyLocation}
             />
           </div>
