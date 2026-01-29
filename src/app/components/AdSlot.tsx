@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 type Props = {
-    type: 'SIDEBAR' | 'SIDEBAR_TOP' | 'FILTER' | 'MAP_BOTTOM';
+    type: 'SIDEBAR' | 'SIDEBAR_TOP' | 'FILTER' | 'MAP_BOTTOM' | 'SIDEBAR_BOTTOM';
     id: string;
 };
 
@@ -42,6 +42,21 @@ export default function AdSlot({ type, id }: Props) {
                     fontSize: '11px',
                     color: '#333',
                     borderRadius: '12px'
+                };
+            case 'SIDEBAR_BOTTOM':
+                return {
+                    width: '100%',
+                    minHeight: '100px',
+                    margin: '16px 0 8px 0',
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    color: 'rgba(255, 255, 255, 0.5)',
+                    borderRadius: '12px',
+                    boxSizing: 'border-box'
                 };
             case 'MAP_BOTTOM':
                 return {

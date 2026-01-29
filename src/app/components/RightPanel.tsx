@@ -4,6 +4,7 @@ import styles from './RightPanel.module.css';
 import { Place } from '@/data/places';
 import FilterPanel from './FilterPanel';
 import { useState, useEffect } from 'react';
+import AdSlot from './AdSlot';
 
 type Props = {
   places: Place[];
@@ -229,6 +230,11 @@ export default function RightPanel({
                           </button>
                         </div>
                       )}
+
+                      {/* 하단 고정 광고 영역 */}
+                      <div className={styles.adWrapper}>
+                        <AdSlot type="SIDEBAR_BOTTOM" id="ad-sidebar-list" />
+                      </div>
                     </>
                   );
                 })()
@@ -248,6 +254,10 @@ export default function RightPanel({
               selectedMediaFilters={activeMediaFilters}
               isMobileMode={true}
             />
+            {/* 디스커버리 탭 하단 광고 영역 */}
+            <div className={styles.adWrapper}>
+              <AdSlot type="SIDEBAR_BOTTOM" id="ad-sidebar-discovery" />
+            </div>
           </div>
         )}
       </div>
