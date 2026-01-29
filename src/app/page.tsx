@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { MobileProvider } from './contexts/MobileContext';
 import TopSearchBar from './components/TopSearchBar';
 import RightPanel from './components/RightPanel';
+import AdSlot from './components/AdSlot';
 import MobileShell from './components/MobileShell';
 import InfoBar from './components/InfoBar';
 import { supabase } from '@/lib/supabaseClient';
@@ -103,6 +104,9 @@ function DesktopLayout({
         tab={rightPanelTab}
         onTabChange={setRightPanelTab}
       />
+
+      {/* 하단 애드센스 광고 (클릭 시 확장) */}
+      <AdSlot type="MAP_BOTTOM" id="map-bottom-ad" />
     </div>
   );
 }

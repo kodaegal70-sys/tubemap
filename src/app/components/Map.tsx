@@ -197,7 +197,11 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         if (newMarkers.length > 0) {
             clusterer.addMarkers(newMarkers);
         }
-    }, [places, activePlaceId, onMarkerClick, isSdkLoaded]);
+
+        // [FIX] 데이터(places)가 변경되면 화면에 보이는 장소 리스트를 즉시 재계산하여 부모와 동기화
+        // 줌/이동이 없더라도 필터링 자체가 리스트에 즉시 반영되어야 함
+        calculateVisible();
+    }, [places, activePlaceId, onMarkerClick, isSdkLoaded, calculateVisible]);
 
     const focusedPlaceId = focusedPlace?.id;
     useEffect(() => {
