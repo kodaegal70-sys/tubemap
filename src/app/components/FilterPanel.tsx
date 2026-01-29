@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import styles from './FilterPanel.module.css';
 import AdSlot from './AdSlot';
+import { normalizeMediaName } from '@/lib/v3/utils/media';
 
 type Props = {
     places: any[]; // 전체 장소 데이터
@@ -46,7 +47,7 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
             const mediaStr = p.media_label || p.media;
             if (!mediaStr) return; // 미디어 정보가 없으면 스킵
             const parts = mediaStr.split('|');
-            const raw = parts[0]?.trim(); // 안전하게 trim 적용
+            const raw = normalizeMediaName(parts[0]?.trim()); // 정규화 적용
             if (!raw) return;
 
             counts[raw] = (counts[raw] || 0) + 1;
@@ -189,7 +190,7 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
                                 const count = places.filter(p => {
                                     const mediaStr = p.media_label || p.media;
                                     if (!mediaStr) return false;
-                                    const mediaName = mediaStr.split('|')[0]?.trim();
+                                    const mediaName = normalizeMediaName(mediaStr.split('|')[0]?.trim());
                                     return mediaName === media;
                                 }).length;
 

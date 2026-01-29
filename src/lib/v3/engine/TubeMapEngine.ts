@@ -7,6 +7,7 @@ import { getSupabaseClient } from '../../supabaseClient';
 import { YouTubeCollector } from './YouTubeCollector';
 import { KakaoMatcher, KakaoPlace } from './KakaoMatcher';
 import { CONFIG } from './config';
+import { normalizeMediaName } from '../utils/media';
 import axios from 'axios';
 
 export class TubeMapEngine {
@@ -133,7 +134,7 @@ export class TubeMapEngine {
                 lng: parseFloat(place.x),
                 phone: place.phone,
                 channel_title: videoInfo.channelTitle,
-                media_label: sourceLabel,
+                media_label: normalizeMediaName(sourceLabel.split('|')[0]?.trim()),
                 video_id: videoId,
                 video_url: `https://www.youtube.com/watch?v=${videoId}`,
                 published_at: videoInfo.publishedAt,

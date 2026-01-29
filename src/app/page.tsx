@@ -10,6 +10,7 @@ import MobileShell from './components/MobileShell';
 import InfoBar from './components/InfoBar';
 import { supabase } from '@/lib/supabaseClient';
 import { Place, DUMMY_PLACES, checkCategoryMatch } from '@/data/places';
+import { normalizeMediaName } from '@/lib/v3/utils/media';
 
 const MapComponent = dynamic(() => import('./components/Map'), { ssr: false });
 
@@ -152,7 +153,11 @@ function HomeContent() {
     return allPlaces.filter(p => {
       const mediaStr = p.media_label || p.media;
       const mediaMatch = activeMediaFilters.length === 0 ||
-        (mediaStr?.split(',').some(m => activeMediaFilters.includes(m.split('|')[0]?.trim())) ?? false);
+        (mediaStr?.split(',').some(m => {
+          const rawMedia = m.split('|')[0]?.trim();
+          const normalized = normalizeMediaName(rawMedia);
+          return activeMediaFilters.includes(normalized);
+        }) ?? false);
       const catMatch = checkCategoryMatch(p, activeCategoryFilters);
       return mediaMatch && catMatch;
     });
