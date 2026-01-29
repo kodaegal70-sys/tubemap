@@ -151,7 +151,7 @@ function HomeContent() {
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
       const mediaMatch = activeMediaFilters.length === 0 ||
-        p.media.split(',').some(m => activeMediaFilters.includes(m.split('|')[0]?.trim()));
+        (p.media?.split(',').some(m => activeMediaFilters.includes(m.split('|')[0]?.trim())) ?? false);
       const catMatch = checkCategoryMatch(p, activeCategoryFilters);
       return mediaMatch && catMatch;
     });

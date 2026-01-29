@@ -43,6 +43,7 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
         const typeMap: { [key: string]: 'YOUTUBE' | 'BROADCAST' | 'OTHER' } = {};
 
         places.forEach(p => {
+            if (!p.media) return; // 미디어 정보가 없으면 스킵
             const parts = p.media.split('|');
             const raw = parts[0]?.trim(); // 안전하게 trim 적용
             if (!raw) return;
@@ -185,6 +186,7 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
                             {paginatedMediaList.map((media, index) => {
                                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
                                 const count = places.filter(p => {
+                                    if (!p.media) return false;
                                     const mediaName = p.media.split('|')[0]?.trim();
                                     return mediaName === media;
                                 }).length;
