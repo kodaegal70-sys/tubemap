@@ -200,7 +200,6 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
     // 적용 후 BottomSheet를 half로 변경하고 리스트 탭으로 전환
     setSheetState('half');
     setSheetTab('list');
-    setFitBoundsTrigger(prev => prev + 1); // 지도 영역 자동 조정 트리거
   }, [setDiscoveryFilter, setSheetState, setSheetTab]);
 
   const handleSheetStateChange = useCallback((state: 'peek' | 'half' | 'full') => {

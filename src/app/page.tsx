@@ -254,9 +254,6 @@ function HomeContent() {
 
   const handleFilterChange = (filters: { media: string[] }) => {
     setActiveMediaFilters(filters.media);
-    if (filters.media.length > 0) {
-      setFitBoundsTrigger(prev => prev + 1);
-    }
   };
 
   const handleMyLocation = useCallback(() => {

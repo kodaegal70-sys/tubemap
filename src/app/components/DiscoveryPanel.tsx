@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './DiscoveryPanel.module.css';
+import { normalizeMediaName } from '@/lib/v3/utils/media';
 
 interface Props {
   places: any[];
@@ -44,12 +45,13 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
     const typeMap: { [key: string]: 'YOUTUBE' | 'BROADCAST' | 'OTHER' } = {};
 
     places.forEach(p => {
-      // [UX] 콤마( , )로 구분된 여러 미디어 출처를 각각 분리하여 처리
-      const mediaEntries = p.media.split(',').map((m: string) => m.trim());
+      const mediaStr = p.media_label || p.media;
+      if (!mediaStr) return;
+      const mediaEntries = mediaStr.split(',').map((m: string) => m.trim());
 
       mediaEntries.forEach((entry: string) => {
         const parts = entry.split('|');
-        const raw = parts[0]?.trim();
+        const raw = normalizeMediaName(parts[0]?.trim());
         if (!raw) return;
 
         counts[raw] = (counts[raw] || 0) + 1;
@@ -163,8 +165,10 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
               {paginatedMediaList.map((media, index) => {
                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
                 const count = places.filter(p => {
-                  const mediaEntries = p.media.split(',').map((m: string) => m.trim());
-                  return mediaEntries.some((entry: string) => entry.split('|')[0]?.trim() === media);
+                  const mediaStr = p.media_label || p.media;
+                  if (!mediaStr) return false;
+                  const mediaEntries = mediaStr.split(',').map((m: string) => m.trim());
+                  return mediaEntries.some((entry: string) => normalizeMediaName(entry.split('|')[0]?.trim()) === media);
                 }).length;
 
                 return (
