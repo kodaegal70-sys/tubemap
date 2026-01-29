@@ -83,101 +83,101 @@ export default function RightPanel({
 
       <div className={styles.content}>
         {activeTab === 'list' ? (
-          <>
-            {/* 상세 카드 (핀/리스트 선택 시) */}
-            {focusedPlace && (() => {
-              const mediaLabel = focusedPlace.media_label || focusedPlace.media;
-              const title = focusedPlace.name;
-              const address = focusedPlace.road_address || focusedPlace.address;
-              const phone = focusedPlace.phone;
-              const desc = focusedPlace.best_comment || focusedPlace.description;
-              const imageUrl = focusedPlace.image_state === 'approved' ? focusedPlace.image_url : null;
+          (() => {
+            const filteredPlaces = places.filter((place) => !focusedPlace || focusedPlace.id !== place.id);
+            const totalPages = Math.ceil(filteredPlaces.length / ITEMS_PER_PAGE);
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const paginatedPlaces = filteredPlaces.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-              const youtubeQuery = `${title} ${focusedPlace.channel_title || ''}`.trim();
-              const youtubeUrl = focusedPlace.video_url || `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
+            return (
+              <>
+                <div className={styles.scrollArea}>
+                  {/* 상세 카드 (핀/리스트 선택 시) */}
+                  {focusedPlace && (() => {
+                    const mediaLabel = focusedPlace.media_label || (focusedPlace.media ? focusedPlace.media.split('|')[0] : '');
+                    const title = focusedPlace.name;
+                    const address = focusedPlace.road_address || focusedPlace.address;
+                    const phone = focusedPlace.phone;
+                    const desc = focusedPlace.best_comment || focusedPlace.description;
+                    const imageUrl = focusedPlace.image_state === 'approved' ? focusedPlace.image_url : null;
 
-              // 네이버 검색: 업체명 + 지역(주소 앞 2단어)
-              const addressParts = focusedPlace.address ? focusedPlace.address.split(' ') : [];
-              const region = addressParts.slice(0, 2).join(' ');
-              const naverSearchQuery = `${title} ${region}`.trim();
-              const naverUrl = focusedPlace.naver_url || `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
+                    const youtubeQuery = `${title} ${focusedPlace.channel_title || ''}`.trim();
+                    const youtubeUrl = focusedPlace.video_url || `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
 
-              return (
-                <div className={styles.detailCard}>
-                  <div className={styles.detailTitle}>{title}</div>
+                    // 네이버 검색: 업체명 + 지역(주소 앞 2단어)
+                    const addressParts = focusedPlace.address ? focusedPlace.address.split(' ') : [];
+                    const region = addressParts.slice(0, 2).join(' ');
+                    const naverSearchQuery = `${title} ${region}`.trim();
+                    const naverUrl = focusedPlace.naver_url || `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
 
-                  {address && (
-                    <div className={styles.detailRow}>
-                      <span>📍</span>
-                      <span>{address}</span>
-                    </div>
-                  )}
+                    return (
+                      <div className={styles.detailCard}>
+                        <div className={styles.detailTitle}>{title}</div>
 
-                  {phone && phone.trim().length > 0 && (
-                    <div className={styles.detailRow}>
-                      <span>📞</span>
-                      <span>{phone}</span>
-                    </div>
-                  )}
+                        {address && (
+                          <div className={styles.detailRow}>
+                            <span>📍</span>
+                            <span>{address}</span>
+                          </div>
+                        )}
 
-                  <div className={styles.detailMedia}>
-                    📺 {mediaLabel}
-                  </div>
+                        {phone && phone.trim().length > 0 && (
+                          <div className={styles.detailRow}>
+                            <span>📞</span>
+                            <span>{phone}</span>
+                          </div>
+                        )}
 
-                  {imageUrl ? (
-                    <div className={styles.detailImage}>
-                      <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    </div>
-                  ) : (
-                    <div className={styles.detailImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '12px' }}>
-                      이미지 준비중
-                    </div>
-                  )}
+                        <div className={styles.detailMedia}>
+                          📺 {mediaLabel}
+                        </div>
 
-                  {desc && (
-                    <div className={styles.detailDesc}>“{desc}”</div>
-                  )}
+                        {imageUrl ? (
+                          <div className={styles.detailImage}>
+                            <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        ) : (
+                          <div className={styles.detailImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '12px' }}>
+                            이미지 준비중
+                          </div>
+                        )}
 
-                  <div className={styles.detailActions}>
-                    <a
-                      href={youtubeUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`${styles.detailButton} ${styles.youtubeButton}`}
-                    >
-                      영상 보기
-                    </a>
-                    <a
-                      href={naverUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className={`${styles.detailButton} ${styles.naverButton}`}
-                    >
-                      네이버 검색
-                    </a>
-                  </div>
-                </div>
-              );
-            })()}
+                        {desc && (
+                          <div className={styles.detailDesc}>“{desc}”</div>
+                        )}
 
-            {/* 리스트 */}
-            <div className={styles.listScroll}>
-              {places.length === 0 ? (
-                <div className={styles.empty}>
-                  지도 화면 내에 표시할 맛집이 없습니다.
-                  <br />
-                  지도를 이동하거나 축소해 보세요.
-                </div>
-              ) : (
-                (() => {
-                  const filteredPlaces = places.filter((place) => !focusedPlace || focusedPlace.id !== place.id);
-                  const totalPages = Math.ceil(filteredPlaces.length / ITEMS_PER_PAGE);
-                  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-                  const paginatedPlaces = filteredPlaces.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+                        <div className={styles.detailActions}>
+                          <a
+                            href={youtubeUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`${styles.detailButton} ${styles.youtubeButton}`}
+                          >
+                            영상 보기
+                          </a>
+                          <a
+                            href={naverUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className={`${styles.detailButton} ${styles.naverButton}`}
+                          >
+                            네이버 검색
+                          </a>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
-                  return (
-                    <>
-                      {paginatedPlaces.map((place) => {
+                  {/* 리스트 */}
+                  <div className={styles.listScroll}>
+                    {places.length === 0 ? (
+                      <div className={styles.empty}>
+                        지도 화면 내에 표시할 맛집이 없습니다.
+                        <br />
+                        지도를 이동하거나 축소해 보세요.
+                      </div>
+                    ) : (
+                      paginatedPlaces.map((place) => {
                         const mediaLabel = place.media_label || (place.media ? place.media.split('|')[0] : '');
                         const imageUrl = place.image_state === 'approved' ? place.image_url : null;
                         const desc = place.best_comment || place.description;
@@ -206,57 +206,61 @@ export default function RightPanel({
                             </div>
                           </div>
                         );
-                      })}
+                      })
+                    )}
+                  </div>
+                </div>
 
-                      {/* 페이지네이션 UI */}
-                      {totalPages > 1 && (
-                        <div className={styles.pagination}>
-                          <button
-                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-                            disabled={currentPage === 1}
-                            className={styles.pageButton}
-                          >
-                            ◀
-                          </button>
-                          <span className={styles.pageInfo}>
-                            {currentPage} / {totalPages}
-                          </span>
-                          <button
-                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-                            disabled={currentPage === totalPages}
-                            className={styles.pageButton}
-                          >
-                            ▶
-                          </button>
-                        </div>
-                      )}
-
-                      {/* 하단 고정 광고 영역 */}
-                      <div className={styles.adWrapper}>
-                        <AdSlot type="SIDEBAR_BOTTOM" id="ad-sidebar-list" />
-                      </div>
-                    </>
-                  );
-                })()
-              )}
-            </div>
-          </>
+                {/* 하단 고정 영역: 페이지네이션 + 광고 */}
+                <div className={styles.fixedBottom}>
+                  {totalPages > 1 && (
+                    <div className={styles.pagination}>
+                      <button
+                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                        disabled={currentPage === 1}
+                        className={styles.pageButton}
+                      >
+                        ◀
+                      </button>
+                      <span className={styles.pageInfo}>
+                        {currentPage} / {totalPages}
+                      </span>
+                      <button
+                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                        disabled={currentPage === totalPages}
+                        className={styles.pageButton}
+                      >
+                        ▶
+                      </button>
+                    </div>
+                  )}
+                  <div className={styles.adWrapper}>
+                    <AdSlot type="SIDEBAR_BOTTOM" id="ad-sidebar-list" />
+                  </div>
+                </div>
+              </>
+            );
+          })()
         ) : (
           <div className={styles.discoveryWrapper}>
-            <FilterPanel
-              places={allPlaces}
-              onFilterChange={(filters) => {
-                onFilterChange(filters);
-                if (filters.media.length > 0) {
-                  handleTabChange('list');
-                }
-              }}
-              selectedMediaFilters={activeMediaFilters}
-              isMobileMode={true}
-            />
-            {/* 디스커버리 탭 하단 광고 영역 */}
-            <div className={styles.adWrapper}>
-              <AdSlot type="SIDEBAR_BOTTOM" id="ad-sidebar-discovery" />
+            <div className={styles.scrollArea}>
+              <FilterPanel
+                places={allPlaces}
+                onFilterChange={(filters) => {
+                  onFilterChange(filters);
+                  if (filters.media.length > 0) {
+                    handleTabChange('list');
+                  }
+                }}
+                selectedMediaFilters={activeMediaFilters}
+                isMobileMode={true}
+              />
+            </div>
+            {/* 디스커버리 탭 하단 고정 광고 영역 */}
+            <div className={styles.fixedBottom}>
+              <div className={styles.adWrapper}>
+                <AdSlot type="SIDEBAR_BOTTOM" id="ad-sidebar-discovery" />
+              </div>
             </div>
           </div>
         )}

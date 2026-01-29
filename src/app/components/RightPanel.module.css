@@ -19,6 +19,7 @@
    align-items: center;
    justify-content: space-between;
    margin-bottom: 10px;
+   flex-shrink: 0;
  }
 
  .title {
@@ -75,6 +76,13 @@
  .content {
    flex: 1;
    margin-top: 8px;
+   overflow: hidden;
+   display: flex;
+   flex-direction: column;
+ }
+
+ .scrollArea {
+   flex: 1;
    overflow: hidden;
    display: flex;
    flex-direction: column;
@@ -160,9 +168,23 @@
    padding: 20px;
  }
 
+ .fixedBottom {
+   flex-shrink: 0;
+   background: #FA880B;
+   padding-top: 10px;
+   border-top: 1px solid rgba(255, 255, 255, 0.1);
+ }
+
+ .adWrapper {
+   margin-top: 5px;
+   padding: 10px 0 15px 0;
+ }
+
  .discoveryWrapper {
    flex: 1;
    overflow: hidden;
+   display: flex;
+   flex-direction: column;
  }
 
  .detailCard {
@@ -171,6 +193,7 @@
    padding: 14px;
    margin-bottom: 10px;
    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+   flex-shrink: 0;
  }
 
  .detailTitle {
@@ -260,9 +283,8 @@
    align-items: center;
    justify-content: center;
    gap: 15px;
-   padding: 20px 0 10px;
-   border-top: 1px solid rgba(255, 255, 255, 0.1);
-   margin-top: 10px;
+   padding: 10px 0 10px;
+   margin-bottom: 5px;
  }
 
  .pageButton {
