@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Place } from '@/data/places';
-import PlaceImage from './PlaceImage';
 
 type Props = {
     places: Place[];
@@ -37,7 +36,8 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
     const markersRef = useRef<Array<{ marker: any; place: Place }>>([]);
     const clustererRef = useRef<any>(null);
     const isProgrammaticMove = useRef(false);
-    const [activePlaceId, setActivePlaceId] = useState<number | null>(null);
+    const lastFitBoundsTrigger = useRef(0);
+    const [activePlaceId, setActivePlaceId] = useState<number | string | null>(null);
 
     // 1. SDK Loading - Map.tsx가 직접 스크립트 로드 (원래 패턴 복원)
     useEffect(() => {
@@ -233,7 +233,13 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
     // 5. fitBounds
     useEffect(() => {
         const map = mapRef.current;
-        if (!map || !fitBoundsTrigger || places.length === 0 || !isSdkLoaded) return;
+        if (!map || !isSdkLoaded || !fitBoundsTrigger || places.length === 0) return;
+
+        // [중요] fitBoundsTrigger가 실제로 증가했을 때만 실행되도록 가드 추가
+        // 카테고리 필터링 등으로 places가 변경되더라도 지도가 다시 움직이지 않도록 함
+        if (fitBoundsTrigger <= lastFitBoundsTrigger.current) return;
+        lastFitBoundsTrigger.current = fitBoundsTrigger;
+
         const bounds = new window.kakao.maps.LatLngBounds();
         places.forEach(p => bounds.extend(new window.kakao.maps.LatLng(p.lat, p.lng)));
         map.setBounds(bounds);
@@ -259,23 +265,15 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         ps.keywordSearch(searchKeyword, (data: any, status: any) => {
             if (status === window.kakao.maps.services.Status.OK) {
                 const bounds = new window.kakao.maps.LatLngBounds();
-                let hasValidResults = false;
+                data.forEach((item: any) => bounds.extend(new window.kakao.maps.LatLng(item.y, item.x)));
+                isProgrammaticMove.current = true;
+                map.setBounds(bounds);
 
-                // 검색 결과들을 포함하는 범위 계산
-                for (let i = 0; i < data.length; i++) {
-                    // 주소 검색 결과가 아닌 일반 장소 검색 결과 중에서도 지역명 필터링 가능
-                    // 여기서는 모든 결과의 범위를 확장
-                    bounds.extend(new window.kakao.maps.LatLng(data[i].y, data[i].x));
-                    hasValidResults = true;
-                }
-
-                if (hasValidResults) {
-                    isProgrammaticMove.current = true;
-                    map.setBounds(bounds);
-
-                    // 사용자가 요청한 대로 줌 레벨을 7로 고정
+                // 업체/장소 검색 시: 
+                // 결과가 1개인 경우 최대 확대(3단계), 여러 개인 경우 bounds 유지
+                if (data.length === 1) {
                     setTimeout(() => {
-                        if (mapRef.current) mapRef.current.setLevel(7);
+                        if (mapRef.current) mapRef.current.setLevel(3);
                     }, 100);
                 }
             } else if (status === window.kakao.maps.services.Status.ZERO_RESULT) {
@@ -284,15 +282,36 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
                 geocoder.addressSearch(searchKeyword, (result: any, status: any) => {
                     if (status === window.kakao.maps.services.Status.OK) {
                         const bounds = new window.kakao.maps.LatLngBounds();
-                        result.forEach((res: any) => {
-                            bounds.extend(new window.kakao.maps.LatLng(res.y, res.x));
-                        });
+                        result.forEach((res: any) => bounds.extend(new window.kakao.maps.LatLng(res.y, res.x)));
                         isProgrammaticMove.current = true;
                         map.setBounds(bounds);
 
-                        // 주소 검색 시에도 줌 레벨을 7로 고정
+                        // [지능형 줌] 주소의 상세도에 따라 줌 레벨 결정
+                        const first = result[0];
+                        let zoomLevel = 7; // 기본값 (시/군/구)
+
+                        if (first.address) {
+                            const addr = first.address;
+                            // 1. 시/도 (광역) -> 줌 10 (서울, 충청남도 등)
+                            if (addr.region_2depth_name === '') {
+                                zoomLevel = 10;
+                            }
+                            // 2. 구/시 (기초) -> 줌 7 (마포구, 천안시 등)
+                            else if (addr.region_3depth_name === '') {
+                                zoomLevel = 7;
+                            }
+                            // 3. 동/면/리 (읍면동) -> 줌 5 (두정동, 역삼동 등)
+                            else if (addr.main_address_no === '') {
+                                zoomLevel = 5;
+                            }
+                            // 4. 번지/상세장소 -> 줌 3
+                            else {
+                                zoomLevel = 3;
+                            }
+                        }
+
                         setTimeout(() => {
-                            if (mapRef.current) mapRef.current.setLevel(7);
+                            if (mapRef.current) mapRef.current.setLevel(zoomLevel);
                         }, 100);
                     }
                 });

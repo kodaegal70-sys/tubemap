@@ -44,27 +44,32 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
     const typeMap: { [key: string]: 'YOUTUBE' | 'BROADCAST' | 'OTHER' } = {};
 
     places.forEach(p => {
-      const parts = p.media.split('|');
-      const raw = parts[0]?.trim(); // 안전하게 trim 적용
-      if (!raw) return;
+      // [UX] 콤마( , )로 구분된 여러 미디어 출처를 각각 분리하여 처리
+      const mediaEntries = p.media.split(',').map((m: string) => m.trim());
 
-      counts[raw] = (counts[raw] || 0) + 1;
+      mediaEntries.forEach((entry: string) => {
+        const parts = entry.split('|');
+        const raw = parts[0]?.trim();
+        if (!raw) return;
 
-      if (typeMap[raw]) return;
+        counts[raw] = (counts[raw] || 0) + 1;
 
-      const lowerRaw = raw.toLowerCase();
-      let identifiedType: 'YOUTUBE' | 'BROADCAST' | 'OTHER' = 'OTHER';
+        if (typeMap[raw]) return;
 
-      if (MEDIA_KEYWORDS.YOUTUBE_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
-        identifiedType = 'YOUTUBE';
-      } else if (MEDIA_KEYWORDS.BROADCAST_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
-        identifiedType = 'BROADCAST';
-      } else {
-        if (['성시경', '풍자', '쯔양', '히밥', '백종원'].some(name => lowerRaw.includes(name))) {
+        const lowerRaw = raw.toLowerCase();
+        let identifiedType: 'YOUTUBE' | 'BROADCAST' | 'OTHER' = 'OTHER';
+
+        if (MEDIA_KEYWORDS.YOUTUBE_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
           identifiedType = 'YOUTUBE';
+        } else if (MEDIA_KEYWORDS.BROADCAST_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
+          identifiedType = 'BROADCAST';
+        } else {
+          if (['성시경', '풍자', '쯔양', '히밥', '백종원'].some(name => lowerRaw.includes(name))) {
+            identifiedType = 'YOUTUBE';
+          }
         }
-      }
-      typeMap[raw] = identifiedType;
+        typeMap[raw] = identifiedType;
+      });
     });
 
     const sorted = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
@@ -158,8 +163,8 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
               {paginatedMediaList.map((media, index) => {
                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
                 const count = places.filter(p => {
-                  const mediaName = p.media.split('|')[0]?.trim();
-                  return mediaName === media;
+                  const mediaEntries = p.media.split(',').map((m: string) => m.trim());
+                  return mediaEntries.some((entry: string) => entry.split('|')[0]?.trim() === media);
                 }).length;
 
                 return (

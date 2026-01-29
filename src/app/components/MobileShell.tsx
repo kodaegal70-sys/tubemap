@@ -62,11 +62,11 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
       // 카테고리 필터 (보완된 유틸리티 사용)
-      const catMatch = checkCategoryMatch(p.category, categoryFilter);
+      const catMatch = checkCategoryMatch(p, categoryFilter);
 
       // 디스커버리 필터 (미디어)
       const mediaMatch = discoveryFilter.selectedMedia.length === 0 ||
-        discoveryFilter.selectedMedia.includes(p.media.split('|')[0]?.trim());
+        p.media.split(',').some(m => discoveryFilter.selectedMedia.includes(m.split('|')[0]?.trim()));
 
       return catMatch && mediaMatch;
     });
@@ -176,7 +176,6 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
       // [UX] 카테고리 선택 시 자동으로 리스트 탭으로 전환 (순수 함수 밖에서 실행)
       setSheetTab('list');
       setSheetState('half');
-      setFitBoundsTrigger(prev => prev + 1);
     }
 
     setCategoryFilter(prev =>
@@ -227,6 +226,12 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
     return allPlaces.find(p => p.id === selectedPlaceId) || null;
   }, [selectedPlaceId, allPlaces]);
 
+  // 수동 조작 시 로컬 검색 상태도 초기화
+  const handleInternalManualInteraction = useCallback(() => {
+    setSearchKeyword('');
+    if (onManualInteraction) onManualInteraction();
+  }, [onManualInteraction]);
+
   return (
     <div style={{ width: '100vw', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
       {/* 지도 - 항상 배경에 고정 */}
@@ -235,7 +240,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
         focusedPlace={focusedPlace}
         onMapMove={handleMapMove}
         onMarkerClick={handleMarkerClick}
-        onManualInteraction={onManualInteraction}
+        onManualInteraction={handleInternalManualInteraction}
         fitBoundsTrigger={fitBoundsTrigger}
         isMobile={true}
         mobileSheetState={sheetState}

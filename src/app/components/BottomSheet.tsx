@@ -4,7 +4,6 @@ import { useRef, useEffect, useState } from 'react';
 import { useMobile } from '../contexts/MobileContext';
 import styles from './BottomSheet.module.css';
 import { Place } from '@/data/places';
-import PlaceImage from './PlaceImage';
 import DiscoveryPanel from './DiscoveryPanel';
 
 interface Props {
@@ -175,19 +174,22 @@ export default function BottomSheet({
               <div className={styles.listContainer}>
                 {places.map(place => {
                   const isActive = focusedPlace && focusedPlace.id === place.id;
+                  const mediaLabel = place.media_label || place.media.split('|')[0];
+                  const title = place.name;
+                  const desc = place.best_comment || place.description;
+                  const imageUrl = place.image_state === 'approved' ? place.image_url : null;
 
                   if (isActive) {
-                    const [mediaChannelRaw, mediaProgramRaw] = place.media.split('|');
-                    const mediaChannel = mediaChannelRaw?.trim() || '';
-                    const mediaProgram = mediaProgramRaw?.trim() || '';
-                    const youtubeQuery = `${place.name} ${mediaChannel || ''}`.trim();
-                    const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
+                    const youtubeQuery = `${place.name} ${place.channel_title || ''}`.trim();
+                    const youtubeUrl = place.video_url || `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
 
-                    // 네이버 검색 URL: 업체명 + 지역명(주소 앞 2단어) 조합
+                    // 네이버 검색: 업체명 + 지역(주소 앞 2단어)
                     const addressParts = place.address ? place.address.split(' ') : [];
                     const region = addressParts.slice(0, 2).join(' ');
                     const naverSearchQuery = `${place.name} ${region}`.trim();
-                    const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
+                    const naverUrl = place.naver_url || `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
+
+                    const address = place.road_address || place.address;
 
                     return (
                       <div
@@ -195,18 +197,27 @@ export default function BottomSheet({
                         className={`${styles.item} ${styles.itemSelected}`}
                         onClick={() => handlePlaceClick(place)}
                       >
-                        <div className={styles.itemImage}>
-                          <PlaceImage src={place.image_url} alt={place.name} />
-                        </div>
                         <div className={styles.itemInfo}>
-                          <div className={styles.itemName}>{place.name}</div>
+                          <div className={styles.itemName}>{title}</div>
+
+                          {imageUrl && (
+                            <div style={{ width: '100%', height: '160px', borderRadius: '8px', overflow: 'hidden', marginBottom: '10px' }}>
+                              <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                          )}
+                          {!imageUrl && (
+                            <div style={{ width: '100%', height: '100px', borderRadius: '8px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', fontSize: '12px', color: '#888' }}>
+                              이미지 준비중
+                            </div>
+                          )}
+
                           <div className={styles.itemMedia}>
-                            📺 {mediaChannel || place.media}
+                            📺 {mediaLabel}
                           </div>
-                          {place.address && (
+                          {address && (
                             <div className={styles.itemRow}>
                               <span>📍</span>
-                              <span>{place.address}</span>
+                              <span>{address}</span>
                             </div>
                           )}
                           {place.phone && place.phone.trim().length > 0 && (
@@ -215,8 +226,8 @@ export default function BottomSheet({
                               <span>{place.phone}</span>
                             </div>
                           )}
-                          {place.description && (
-                            <div className={styles.itemDesc}>{place.description}</div>
+                          {desc && (
+                            <div className={styles.itemDesc} style={{ margin: '8px 0', fontStyle: 'italic' }}>“{desc}”</div>
                           )}
                           <div className={styles.detailActions}>
                             <a
@@ -225,7 +236,7 @@ export default function BottomSheet({
                               rel="noreferrer"
                               className={`${styles.detailButton} ${styles.youtubeButton}`}
                             >
-                              유튜브 보기
+                              영상 보기
                             </a>
                             <a
                               href={naverUrl}
@@ -251,15 +262,21 @@ export default function BottomSheet({
                       className={styles.item}
                       onClick={() => handlePlaceClick(place)}
                     >
-                      <div className={styles.itemImage}>
-                        <PlaceImage src={place.image_url} alt={place.name} />
-                      </div>
-                      <div className={styles.itemInfo}>
-                        <div className={styles.itemName}>{place.name}</div>
-                        <div className={styles.itemMedia}>
-                          📺 {place.media.split('|')[0]}
+                      {imageUrl ? (
+                        <div className={styles.itemImage}>
+                          <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                         </div>
-                        <div className={styles.itemDesc}>{place.description}</div>
+                      ) : (
+                        <div className={styles.itemImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', color: '#888' }}>
+                          준비중
+                        </div>
+                      )}
+                      <div className={styles.itemInfo}>
+                        <div className={styles.itemName}>{title}</div>
+                        <div className={styles.itemMedia}>
+                          📺 {mediaLabel}
+                        </div>
+                        {desc && <div className={styles.itemDesc}>“{desc}”</div>}
                       </div>
                     </div>
                   );

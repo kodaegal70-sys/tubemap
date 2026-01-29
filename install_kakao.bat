@@ -1,3 +1,0 @@
-@echo off
-echo Installing react-kakao-maps-sdk...
-call npm install react-kakao-maps-sdk -f

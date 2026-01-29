@@ -20,8 +20,8 @@ interface MobileContextType {
   setSheetTab: (tab: SheetTab | ((prev: SheetTab) => SheetTab)) => void;
 
   // 선택된 장소
-  selectedPlaceId: number | null;
-  setSelectedPlaceId: (id: number | null | ((prev: number | null) => number | null)) => void;
+  selectedPlaceId: number | string | null;
+  setSelectedPlaceId: (id: number | string | null | ((prev: number | string | null) => number | string | null)) => void;
 
   // 카테고리 필터
   categoryFilter: string[];
@@ -41,7 +41,7 @@ const MobileContext = createContext<MobileContextType | undefined>(undefined);
 export function MobileProvider({ children }: { children: ReactNode }) {
   const [sheetState, setSheetState] = useState<SheetState>('peek');
   const [sheetTab, setSheetTab] = useState<SheetTab>('list');
-  const [selectedPlaceId, setSelectedPlaceId] = useState<number | null>(null);
+  const [selectedPlaceId, setSelectedPlaceId] = useState<number | string | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string[]>([]);
   const [discoveryFilter, setDiscoveryFilter] = useState<DiscoveryFilter>({
     tab: 'ALL',

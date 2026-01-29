@@ -1,10 +1,8 @@
 'use client';
-
 import { useState, useEffect, useMemo } from 'react';
 import styles from './Sidebar.module.css';
 import { Place } from '@/data/places';
 import AdSlot from './AdSlot';
-import PlaceImage from './PlaceImage';
 
 type Props = {
     places: Place[];
@@ -184,16 +182,6 @@ export default function Sidebar({ places, onPlaceClick, onSearch, onMoveToCurren
                     <>
                         {paginatedPlaces.map((place) => (
                             <div key={place.id} className={styles.item} onClick={() => onPlaceClick(place)}>
-                                {/* 이미지 영역 - 이미지 있을 때만 표시 */}
-                                {place.image_url && (
-                                    <div className={styles.itemImage}>
-                                        <PlaceImage
-                                            src={place.image_url}
-                                            alt={place.name}
-                                        />
-                                    </div>
-                                )}
-
                                 {/* 텍스트 영역 */}
                                 <div className={styles.itemContent}>
                                     <div className={styles.itemName} style={{ fontSize: '18px', marginBottom: '4px' }}>{place.name}</div>

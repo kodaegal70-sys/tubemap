@@ -81,10 +81,9 @@ function DesktopLayout({
             const isSelecting = !activeCategoryFilters.includes(c);
             if (isSelecting) {
               setRightPanelTab('list');
-              setFitBoundsTrigger(prev => prev + 1);
             }
-            (setActiveCategoryFilters as any)(prev =>
-              prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]
+            (setActiveCategoryFilters as any)((prev: string[]) =>
+              prev.includes(c) ? prev.filter((x: string) => x !== c) : [...prev, c]
             );
           }}
           selectedCategories={activeCategoryFilters}
@@ -151,8 +150,9 @@ function HomeContent() {
   // [FILTER] 마커 표시용 필터링
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
-      const mediaMatch = activeMediaFilters.length === 0 || activeMediaFilters.includes(p.media.split('|')[0]?.trim());
-      const catMatch = checkCategoryMatch(p.category, activeCategoryFilters);
+      const mediaMatch = activeMediaFilters.length === 0 ||
+        p.media.split(',').some(m => activeMediaFilters.includes(m.split('|')[0]?.trim()));
+      const catMatch = checkCategoryMatch(p, activeCategoryFilters);
       return mediaMatch && catMatch;
     });
   }, [allPlaces, activeMediaFilters, activeCategoryFilters]);
@@ -184,34 +184,47 @@ function HomeContent() {
   const handleSearch = useCallback((keyword: string) => {
     const trimmed = keyword.trim();
     if (trimmed) {
-      // 1) 전체 데이터(allPlaces)에서 업체명 우선 필터링
-      const nameMatches = allPlaces.filter(p => p.name.includes(trimmed));
-      const otherMatches = allPlaces.filter(p =>
-        !p.name.includes(trimmed) &&
-        (p.address?.includes(trimmed) || p.description?.includes(trimmed))
-      );
+      if (trimmed.length >= 2) {
+        // 1) 전체 데이터(allPlaces)에서 상호명 검색 점수 계산
+        const scoredMatches = allPlaces
+          .map(p => {
+            let score = 0;
+            const name = p.name.toLowerCase();
+            const lowerTrimmed = trimmed.toLowerCase();
 
-      const allResults = [...nameMatches, ...otherMatches];
+            if (name === lowerTrimmed) {
+              score = 100; // 정확히 일치
+            } else if (name.startsWith(lowerTrimmed)) {
+              score = 80; // 검색어로 시작
+            } else if (name.includes(lowerTrimmed)) {
+              score = 50 + (lowerTrimmed.length * 2); // 포함됨 (매칭 길이에 따른 가산점)
+            }
 
-      if (nameMatches.length > 0) {
-        // 업체명 매칭이 있으면 해당 리스트 필터 적용 및 최적의 업체 자동 선택
-        setCurrentSearch(trimmed);
+            return { place: p, score };
+          })
+          .filter(match => match.score > 0)
+          .sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            // 점수가 같으면 상호명이 짧은 것 우선 (정확도)
+            return a.place.name.length - b.place.name.length;
+          });
 
-        const bestMatch = [...nameMatches].sort((a, b) => {
-          if (a.name === trimmed) return -1;
-          if (b.name === trimmed) return 1;
-          return a.name.length - b.name.length;
-        })[0];
+        if (scoredMatches.length > 0) {
+          // 업체명 매칭이 있으면 해당 리스트 필터 적용 및 최상위 업체 자동 선택
+          setCurrentSearch(trimmed);
+          const bestMatch = scoredMatches[0].place;
 
-        router.push(`?placeId=${bestMatch.id}`, { scroll: false });
+          router.push(`?placeId=${bestMatch.id}`, { scroll: false });
 
-        // 업체가 발견되었으므로 지도의 "지역/외부 검색(searchKeyword)"은 수행하지 않음
-        setSearchKeyword('');
-      } else {
-        // 업체명 일치가 없는 경우 (지역 검색 혹은 주소 검색)
-        setCurrentSearch(trimmed);
-        setSearchKeyword(trimmed);
+          // 업체가 발견되었으므로 지도의 "지역/외부 검색(searchKeyword)"은 수행하지 않음
+          setSearchKeyword('');
+          return;
+        }
       }
+
+      // 2) 업체명 일치가 없거나 검색어가 짧은 경우 (지역 검색 혹은 주소 검색)
+      setCurrentSearch(trimmed);
+      setSearchKeyword(trimmed);
     } else {
       // 검색어가 없으면 초기화
       setCurrentSearch('');
@@ -220,12 +233,14 @@ function HomeContent() {
     }
   }, [allPlaces, router]);
 
-  // [INTERACTION] 수동 조작 시 즉시 상세 해제
+  // [INTERACTION] 수동 조작 시 즉시 상세 및 검색 해제 (탐색 모드로 복원)
   const handleManualInteraction = useCallback(() => {
-    if (placeIdParam) {
+    if (placeIdParam || currentSearch || searchKeyword) {
+      setCurrentSearch('');
+      setSearchKeyword('');
       router.replace('/', { scroll: false });
     }
-  }, [placeIdParam, router]);
+  }, [placeIdParam, currentSearch, searchKeyword, router]);
 
   const handleMarkerClick = useCallback((p: Place) => {
     router.push(`?placeId=${p.id}`, { scroll: false });
@@ -301,7 +316,7 @@ function HomeContent() {
             <MobileShell
               allPlaces={allPlaces}
               onMapMove={handleMapMove}
-              onManualInteraction={() => { }}
+              onManualInteraction={handleManualInteraction}
             />
           </div>
         )}

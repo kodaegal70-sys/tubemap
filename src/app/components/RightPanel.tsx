@@ -2,7 +2,6 @@
 
 import styles from './RightPanel.module.css';
 import { Place } from '@/data/places';
-import PlaceImage from './PlaceImage';
 import FilterPanel from './FilterPanel';
 import { useState } from 'react';
 
@@ -37,6 +36,7 @@ export default function RightPanel({
       setInternalTab(newTab);
     }
   };
+
 
   return (
     <aside className={styles.rightPanel}>
@@ -78,50 +78,56 @@ export default function RightPanel({
           <>
             {/* 상세 카드 (핀/리스트 선택 시) */}
             {focusedPlace && (() => {
-              const [mediaChannelRaw, mediaProgramRaw] = focusedPlace.media.split('|');
-              const mediaChannel = mediaChannelRaw?.trim() || '';
-              const mediaProgram = mediaProgramRaw?.trim() || '';
-              const youtubeQuery = `${focusedPlace.name} ${mediaChannel || ''}`.trim();
-              const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(
-                youtubeQuery,
-              )}`;
+              const mediaLabel = focusedPlace.media_label || focusedPlace.media;
+              const title = focusedPlace.name;
+              const address = focusedPlace.road_address || focusedPlace.address;
+              const phone = focusedPlace.phone;
+              const desc = focusedPlace.best_comment || focusedPlace.description;
+              const imageUrl = focusedPlace.image_state === 'approved' ? focusedPlace.image_url : null;
 
-              // 네이버 검색 URL: 업체명 + 지역명(주소 앞 2단어) 조합
+              const youtubeQuery = `${title} ${focusedPlace.channel_title || ''}`.trim();
+              const youtubeUrl = focusedPlace.video_url || `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
+
+              // 네이버 검색: 업체명 + 지역(주소 앞 2단어)
               const addressParts = focusedPlace.address ? focusedPlace.address.split(' ') : [];
               const region = addressParts.slice(0, 2).join(' ');
-              const naverSearchQuery = `${focusedPlace.name} ${region}`.trim();
-              const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
+              const naverSearchQuery = `${title} ${region}`.trim();
+              const naverUrl = focusedPlace.naver_url || `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
 
               return (
                 <div className={styles.detailCard}>
-                  <div className={styles.detailTitle}>{focusedPlace.name}</div>
+                  <div className={styles.detailTitle}>{title}</div>
 
-                  {focusedPlace.address && (
+                  {address && (
                     <div className={styles.detailRow}>
                       <span>📍</span>
-                      <span>{focusedPlace.address}</span>
+                      <span>{address}</span>
                     </div>
                   )}
 
-                  {focusedPlace.phone && focusedPlace.phone.trim().length > 0 && (
+                  {phone && phone.trim().length > 0 && (
                     <div className={styles.detailRow}>
                       <span>📞</span>
-                      <span>{focusedPlace.phone}</span>
+                      <span>{phone}</span>
                     </div>
                   )}
 
                   <div className={styles.detailMedia}>
-                    📺 {mediaChannel || focusedPlace.media}
+                    📺 {mediaLabel}
                   </div>
 
-                  {focusedPlace.image_url && (
+                  {imageUrl ? (
                     <div className={styles.detailImage}>
-                      <PlaceImage src={focusedPlace.image_url} alt={focusedPlace.name} />
+                      <img src={imageUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    </div>
+                  ) : (
+                    <div className={styles.detailImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '12px' }}>
+                      이미지 준비중
                     </div>
                   )}
 
-                  {focusedPlace.description && (
-                    <div className={styles.detailDesc}>{focusedPlace.description}</div>
+                  {desc && (
+                    <div className={styles.detailDesc}>“{desc}”</div>
                   )}
 
                   <div className={styles.detailActions}>
@@ -131,7 +137,7 @@ export default function RightPanel({
                       rel="noreferrer"
                       className={`${styles.detailButton} ${styles.youtubeButton}`}
                     >
-                      유튜브 보기
+                      영상 보기
                     </a>
                     <a
                       href={naverUrl}
@@ -155,30 +161,39 @@ export default function RightPanel({
                   지도를 이동하거나 축소해 보세요.
                 </div>
               ) : (
-                places.map((place) => {
-                  const mediaLabel = place.media.split('|')[0];
-                  const isActive = focusedPlace && focusedPlace.id === place.id;
-                  return (
-                    <div
-                      key={place.id}
-                      className={`${styles.placeCard} ${isActive ? styles.placeCardActive : ''}`}
-                      onClick={() => onPlaceClick(place)}
-                    >
-                      {place.image_url && (
-                        <div className={styles.thumb}>
-                          <PlaceImage src={place.image_url} alt={place.name} />
-                        </div>
-                      )}
-                      <div className={styles.info}>
-                        <div className={styles.name}>{place.name}</div>
-                        <div className={styles.mediaLabel}>📺 {mediaLabel}</div>
-                        {place.description && (
-                          <div className={styles.desc}>{place.description}</div>
+                (() => {
+                  const filteredPlaces = places.filter((place) => !focusedPlace || focusedPlace.id !== place.id);
+                  return filteredPlaces.map((place) => {
+                    const mediaLabel = place.media_label || place.media.split('|')[0];
+                    const imageUrl = place.image_state === 'approved' ? place.image_url : null;
+                    const desc = place.best_comment || place.description;
+
+                    return (
+                      <div
+                        key={place.id}
+                        className={styles.placeCard}
+                        onClick={() => onPlaceClick(place)}
+                      >
+                        {imageUrl ? (
+                          <div className={styles.thumb}>
+                            <img src={imageUrl} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          </div>
+                        ) : (
+                          <div className={styles.thumb} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '10px', textAlign: 'center', padding: '4px' }}>
+                            준비중
+                          </div>
                         )}
+                        <div className={styles.info}>
+                          <div className={styles.name}>{place.name}</div>
+                          <div className={styles.mediaLabel}>📺 {mediaLabel}</div>
+                          {desc && (
+                            <div className={styles.desc}>“{desc}”</div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  });
+                })()
               )}
             </div>
           </>
