@@ -3,7 +3,7 @@
 import styles from './RightPanel.module.css';
 import { Place } from '@/data/places';
 import FilterPanel from './FilterPanel';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 type Props = {
   places: Place[];
@@ -177,7 +177,7 @@ export default function RightPanel({
                   return (
                     <>
                       {paginatedPlaces.map((place) => {
-                        const mediaLabel = place.media_label || place.media.split('|')[0];
+                        const mediaLabel = place.media_label || (place.media ? place.media.split('|')[0] : '');
                         const imageUrl = place.image_state === 'approved' ? place.image_url : null;
                         const desc = place.best_comment || place.description;
 
