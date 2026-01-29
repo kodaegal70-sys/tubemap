@@ -48,15 +48,16 @@ export default function AdSlot({ type, id }: Props) {
                     width: '100%',
                     minHeight: '100px',
                     margin: '16px 0 8px 0',
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    background: '#fff',
+                    border: '1px solid #eee',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     fontSize: '11px',
-                    color: 'rgba(255, 255, 255, 0.5)',
+                    color: '#999',
                     borderRadius: '12px',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
                 };
             case 'MAP_BOTTOM':
                 return {
