@@ -253,3 +253,46 @@
      width: 340px;
    }
  }
+
+ /* 페이지네이션 */
+ .pagination {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 15px;
+   padding: 20px 0 10px;
+   border-top: 1px solid rgba(255, 255, 255, 0.1);
+   margin-top: 10px;
+ }
+
+ .pageButton {
+   border: 1px solid rgba(255, 255, 255, 0.2);
+   background: rgba(255, 255, 255, 0.1);
+   padding: 6px 14px;
+   border-radius: 8px;
+   font-size: 12px;
+   color: #fff;
+   cursor: pointer;
+   transition: all 0.2s ease;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
+
+ .pageButton:hover:not(:disabled) {
+   background: #fff;
+   color: #FA880B;
+ }
+
+ .pageButton:disabled {
+   opacity: 0.3;
+   cursor: default;
+ }
+
+ .pageInfo {
+   font-size: 13px;
+   font-weight: 700;
+   color: #fff;
+   min-width: 50px;
+   text-align: center;
+ }
