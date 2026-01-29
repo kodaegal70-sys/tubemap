@@ -83,21 +83,23 @@ export class YouTubeCollector {
                 }
             }
 
-            let matchCount = 0;
-            const matches: string[] = [];
-            for (const kw of CONFIG.SEARCH_REQUIRED_KEYWORDS) {
+            const validKeywords = CONFIG.SEARCH_REQUIRED_KEYWORDS || [];
+            const foundKeywords: string[] = [];
+            for (const kw of validKeywords) {
                 if (textToCheck.includes(kw.toLowerCase())) {
-                    matchCount++;
-                    matches.push(kw);
+                    foundKeywords.push(kw);
                 }
             }
+            const matchCount = foundKeywords.length;
 
-            if (matchCount < CONFIG.MIN_KEYWORDS_MATCH) {
-                console.log(`[YouTubeCollector] Skipped ${videoId}: Low keyword match (${matchCount}). Found: [${matches.join(", ")}]`);
-                console.log(`[YouTubeCollector] Required ${CONFIG.MIN_KEYWORDS_MATCH} from: ${CONFIG.SEARCH_REQUIRED_KEYWORDS.slice(0, 5).join(", ")}...`);
-                return null;
+            // [MVP] Disable Strict Keyword Filter here. relying on DescriptionGate later.
+            if (matchCount < (CONFIG.MIN_KEYWORDS_MATCH || 1)) {
+                console.log(`[YouTubeCollector] Low keyword match for ${videoId} (${matchCount}). Found: ${foundKeywords.join(', ')}`);
+                console.log(`[YouTubeCollector] Required ${CONFIG.MIN_KEYWORDS_MATCH} from: ${validKeywords.slice(0, 5).join(', ')}...`);
+                // return null; // Commented out to relax the check
             }
 
+            console.log(`[YouTubeCollector] Fetched ${videoId}: "${item.snippet.title}"`);
             return {
                 videoId: videoId,
                 title: item.snippet.title || "",
@@ -148,12 +150,53 @@ export class YouTubeCollector {
             candidates.push({ name: match2[1].trim() });
         }
 
-        // [New v1.6.1] Filter out Program Names and Channel Names from candidates
+        // Pattern 3: Explicit "XX맛집" or "XX식당" pattern (New V1.6.1)
+        // Extract "Name" from "Name맛집", "Name식당"
+        const regex3 = /([가-힣\w\s]+?)(맛집|식당|반점|가게|집)(\s|$|:)/;
+        const match3 = text.match(regex3);
+        if (match3 && match3[1]) {
+            const nameCandidate = match3[1].trim();
+            // Avoid extracting just the region name (e.g. "강남맛집" -> "강남")
+            // Simple check: length > 1
+            if (nameCandidate.length > 1) {
+                candidates.push({ name: nameCandidate });
+            }
+        }
+
+        // Pattern 4: "XXX님 XXX집" or "XXX집" (Strict short phrase)
+        // Limit length to avoid capturing sentences.
+        const regex4 = /([가-힣\w]{2,10}?)(님)?\s*([가-힣\w\s]{0,10}?)(집|가게|식당|반점)(?=\s|$|:|[!.,])/;
+        const match4 = text.match(regex4);
+        if (match4) {
+            let nameCandidate = "";
+            if (match4[2]) { // If "님" is present, combine first and third group
+                nameCandidate = `${match4[1].trim()} ${match4[3].trim()}${match4[4].trim()}`;
+            } else { // Otherwise, it's just the third group + suffix
+                // Check if Group 3 is empty (e.g. "짬뽕집" without prefix?) -> Skip
+                if (match4[3].trim().length > 0 || match4[1].trim().length > 0) {
+                    // If Group 3 is empty, maybe Group 1 is the name?
+                    // Case: "이봉원님 짬뽕집" -> G1=이봉원, G2=님, G3=짬뽕, G4=집
+                    // Case: "짬뽕집" -> G1=짬뽕, G4=집
+                    nameCandidate = `${match4[1].trim()} ${match4[3].trim()}${match4[4].trim()}`;
+                }
+            }
+            if (nameCandidate.length > 2) { // Too short is risky
+                candidates.push({ name: nameCandidate.replace(/\s+/g, ' ').trim() });
+            }
+        }
+
+        // [New v1.6.1] Filter out Program Names, Channel Names, and Noise Keywords from candidates
         const TECH_TERMS = ['eng', 'sub', 'shorts', 'ep.', '1탄', '2탄', '3탄', '모음', '스페셜', 'special'];
+        const NOISE_KEYWORDS = [
+            '맛집', '먹방', 'mukbang', '리뷰', 'review', 'vlog', '브이로그',
+            '도전먹방', '도전 먹방', '술먹방', '혼술', '노포', '가게', '식당', '집', '점',
+            '성공', '실패', '다먹으면'
+        ];
+
         const filtered = candidates
             .map(c => {
                 let name = c.name.trim();
-                // Strip technical terms from the name instead of rejecting the whole thing
+                // Strip technical terms
                 for (const term of TECH_TERMS) {
                     const regex = new RegExp(`\\s*${term.replace('.', '\\.')}\\s*`, 'gi');
                     name = name.replace(regex, ' ').trim();
@@ -163,6 +206,15 @@ export class YouTubeCollector {
             .filter(c => {
                 const name = c.name.toLowerCase().trim();
                 if (name.length < 2) return false;
+
+                // 1. Check Noise Keywords (Exact)
+                // Reject if name is EXACTLY a noise keyword
+                if (NOISE_KEYWORDS.some(n => n === name)) return false;
+
+                // 2. Check Logic: "Category + Suffix" only? (e.g. "짬뽕집") -> Weak candidate
+                // But "이봉원님 짬뽕집" -> Strong.
+                // If name ends with '맛집' and is short, reject.
+                if (name.endsWith('맛집') && name.length < 5) return false; // "찐맛집" reject
 
                 const isProgram = CONFIG.BROADCAST_PROGRAMS.some(p => p.toLowerCase().trim() === name);
                 const isChannel = CONFIG.YOUTUBE_CHANNELS.some(ch => ch.toLowerCase().trim() === name);

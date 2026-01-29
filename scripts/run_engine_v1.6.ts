@@ -24,10 +24,9 @@ async function main() {
         console.log(`🎯 Target: ${target}`);
         await engine.discoverAndProcess(target);
     } else {
-        // Default: Pick one random from channel list
-        const randomChannel = CONFIG.YOUTUBE_CHANNELS[Math.floor(Math.random() * CONFIG.YOUTUBE_CHANNELS.length)];
-        console.log(`🎲 Random Target (Default): ${randomChannel}`);
-        await engine.discoverAndProcess(randomChannel);
+        // Default: Use Auto Seed Generation
+        console.log(`🎲 Auto-Mode: Generating combinatorial seeds...`);
+        await engine.discoverAndProcess();
     }
 
     console.log("✅ [TubeMap v1.6] Execution Finished.");

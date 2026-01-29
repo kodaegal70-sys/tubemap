@@ -275,8 +275,32 @@ function HomeContent() {
     );
   }, []);
 
+  // [OFFLINE MODE SWITCH]
+  const ENABLE_OFFLINE_MODE = true;
+
   useEffect(() => {
-    if (supabase) {
+    if (ENABLE_OFFLINE_MODE) {
+      console.log("⚠️ Offline Mode: Loading from local JSON...");
+      import('@/data/offline_places.json')
+        .then((mod) => {
+          // Default export or the module itself
+          // It's likely an array based on how we write it
+          const raw = mod.default || mod;
+          // Need to cast or validate
+          if (Array.isArray(raw)) {
+            // Ensure dummy IDs are strings or numbers as component expects
+            const formatted = (raw as any[]).map(p => ({
+              ...p,
+              // Fix ID if missing (engine generates kakao_place_id as string, we can use it as id)
+              id: p.id || p.kakao_place_id
+            }));
+            setAllPlaces(formatted);
+          }
+        })
+        .catch(err => {
+          console.error("Failed to load offline data", err);
+        });
+    } else if (supabase) {
       supabase.from('places').select('*').then(({ data }) => {
         if (data && data.length > 0) setAllPlaces(data);
       });

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import styles from './InfoBar.module.css';
 
-type Panel = 'about' | 'privacy' | 'ads' | null;
+type Panel = 'about' | 'privacy' | 'terms' | 'ads' | null;
 
 export default function InfoBar() {
   const [openPanel, setOpenPanel] = useState<Panel>(null);
@@ -37,10 +37,14 @@ export default function InfoBar() {
         <button
           type="button"
           className={styles.linkButton}
-          onClick={() => handleToggle('ads')}
+          onClick={() => handleToggle('terms')}
         >
-          광고 안내
+          이용약관
         </button>
+        <span className={styles.divider}>·</span>
+        <a href="/contact" className={styles.linkButton} style={{ textDecoration: 'none' }}>
+          문의하기
+        </a>
       </div>
 
       {openPanel && (
@@ -52,7 +56,8 @@ export default function InfoBar() {
             <div className={styles.panelHeader}>
               <span className={styles.panelTitle}>
                 {openPanel === 'about' && 'Tube Map 서비스 소개'}
-                {openPanel === 'privacy' && '개인정보 안내'}
+                {openPanel === 'privacy' && '개인정보처리방칭 안내'}
+                {openPanel === 'terms' && '이용약관 안내'}
                 {openPanel === 'ads' && '광고 및 수익 구조 안내'}
               </span>
               <button
@@ -90,6 +95,17 @@ export default function InfoBar() {
                   </p>
                 </>
               )}
+              {openPanel === 'terms' && (
+                <>
+                  <p>
+                    Tube Map은 맛집 정보를 지도에서 쉽게 탐색할 수 있는 무료 웹 서비스입니다.
+                    본 서비스는 정보 제공 목적으로만 운영되며, 상업적 목적으로 데이터를 무단 수집(크롤링 등)하는 행위를 금지합니다.
+                  </p>
+                  <p>
+                    자세한 약관은 <a href="/terms" style={{ color: '#0366d6', textDecoration: 'underline' }}>이용약관 전문 페이지</a>에서 확인하실 수 있습니다.
+                  </p>
+                </>
+              )}
               {openPanel === 'ads' && (
                 <>
                   <p>
@@ -104,10 +120,16 @@ export default function InfoBar() {
               )}
             </div>
             <div className={styles.panelFooter}>
-              <span>문의: </span>
-              <a href="mailto:kodaegal70@gmail.com" className={styles.mailLink}>
-                kodaegal70@gmail.com
-              </a>
+              <div className={styles.disclosure}>
+                본 서비스는 공개된 정보(YouTube, Kakao 등)를 기반으로 장소 정보를 정리·제공합니다.
+                상표 및 콘텐츠의 권리는 각 소유자에게 있습니다. 요청 시 수정/삭제 처리합니다.
+              </div>
+              <div className={styles.contactInfo}>
+                <span>문의: </span>
+                <a href="mailto:kodaegal70@gmail.com" className={styles.mailLink}>
+                  kodaegal70@gmail.com
+                </a>
+              </div>
             </div>
           </div>
         </div>

@@ -37,9 +37,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  verification: {
-    google: "your-google-verification-code",
-  },
 };
 
 export default function RootLayout({
@@ -47,8 +44,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isAdsenseEnabled = process.env.NEXT_PUBLIC_ADSENSE_ENABLED === "true";
+  const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT; // e.g., ca-pub-123...
+
   return (
     <html lang="ko" suppressHydrationWarning={true}>
+      <head>
+        {isAdsenseEnabled && adsenseClient ? (
+          <Script
+            id="adsense-auto-ads"
+            async
+            strategy="afterInteractive"
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
+            crossOrigin="anonymous"
+          />
+        ) : null}
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
         {children}
       </body>
