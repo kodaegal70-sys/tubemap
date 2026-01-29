@@ -150,8 +150,9 @@ function HomeContent() {
   // [FILTER] 마커 표시용 필터링
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
+      const mediaStr = p.media_label || p.media;
       const mediaMatch = activeMediaFilters.length === 0 ||
-        (p.media?.split(',').some(m => activeMediaFilters.includes(m.split('|')[0]?.trim())) ?? false);
+        (mediaStr?.split(',').some(m => activeMediaFilters.includes(m.split('|')[0]?.trim())) ?? false);
       const catMatch = checkCategoryMatch(p, activeCategoryFilters);
       return mediaMatch && catMatch;
     });

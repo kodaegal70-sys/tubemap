@@ -69,8 +69,8 @@ export interface Place {
     name: string;
     lat: number;
     lng: number;
-    media: string; // Legacy format "Channel|Program", v1.6 uses media_label
-    media_label?: string; // v1.6 New
+    media?: string; // Legacy format "Channel|Program"
+    media_label?: string; // v1.6 Standard "Channel|Program"
     channel_title?: string; // v1.6 New
     video_url?: string; // v1.6 New
     description?: string;
@@ -98,7 +98,7 @@ export const DUMMY_PLACES: Place[] = [
         "lat": 37.519082,
         "lng": 126.930416,
         "media": "성시경|먹을텐데",
-        "media_label": "성시경 먹을텐데",
+        "media_label": "성시경|먹을텐데",
         "channel_title": "성시경 SUNG SI KYUNG",
         "best_comment": "성시경님이 왜 인생 순대국라고 했는지 알겠네요.",
         "best_comment_like_count": 120,

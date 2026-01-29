@@ -65,8 +65,9 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
       const catMatch = checkCategoryMatch(p, categoryFilter);
 
       // 디스커버리 필터 (미디어)
+      const mediaStr = p.media_label || p.media;
       const mediaMatch = discoveryFilter.selectedMedia.length === 0 ||
-        (p.media?.split(',').some(m => discoveryFilter.selectedMedia.includes(m.split('|')[0]?.trim())) ?? false);
+        (mediaStr?.split(',').some(m => discoveryFilter.selectedMedia.includes(m.split('|')[0]?.trim())) ?? false);
 
       return catMatch && mediaMatch;
     });
