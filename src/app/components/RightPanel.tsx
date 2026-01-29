@@ -27,7 +27,14 @@ export default function RightPanel({
   onTabChange,
 }: Props) {
   const [internalTab, setInternalTab] = useState<'list' | 'discovery'>('list');
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 15;
   const activeTab = controlledTab || internalTab;
+
+  // 필터나 탭이 바뀌면 첫 페이지로 리셋
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [places.length, activeTab]);
 
   const handleTabChange = (newTab: 'list' | 'discovery') => {
     if (onTabChange) {
@@ -163,36 +170,67 @@ export default function RightPanel({
               ) : (
                 (() => {
                   const filteredPlaces = places.filter((place) => !focusedPlace || focusedPlace.id !== place.id);
-                  return filteredPlaces.map((place) => {
-                    const mediaLabel = place.media_label || place.media.split('|')[0];
-                    const imageUrl = place.image_state === 'approved' ? place.image_url : null;
-                    const desc = place.best_comment || place.description;
+                  const totalPages = Math.ceil(filteredPlaces.length / ITEMS_PER_PAGE);
+                  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+                  const paginatedPlaces = filteredPlaces.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-                    return (
-                      <div
-                        key={place.id}
-                        className={styles.placeCard}
-                        onClick={() => onPlaceClick(place)}
-                      >
-                        {imageUrl ? (
-                          <div className={styles.thumb}>
-                            <img src={imageUrl} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  return (
+                    <>
+                      {paginatedPlaces.map((place) => {
+                        const mediaLabel = place.media_label || place.media.split('|')[0];
+                        const imageUrl = place.image_state === 'approved' ? place.image_url : null;
+                        const desc = place.best_comment || place.description;
+
+                        return (
+                          <div
+                            key={place.id}
+                            className={styles.placeCard}
+                            onClick={() => onPlaceClick(place)}
+                          >
+                            {imageUrl ? (
+                              <div className={styles.thumb}>
+                                <img src={imageUrl} alt={place.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              </div>
+                            ) : (
+                              <div className={styles.thumb} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '10px', textAlign: 'center', padding: '4px' }}>
+                                준비중
+                              </div>
+                            )}
+                            <div className={styles.info}>
+                              <div className={styles.name}>{place.name}</div>
+                              <div className={styles.mediaLabel}>📺 {mediaLabel}</div>
+                              {desc && (
+                                <div className={styles.desc}>“{desc}”</div>
+                              )}
+                            </div>
                           </div>
-                        ) : (
-                          <div className={styles.thumb} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '10px', textAlign: 'center', padding: '4px' }}>
-                            준비중
-                          </div>
-                        )}
-                        <div className={styles.info}>
-                          <div className={styles.name}>{place.name}</div>
-                          <div className={styles.mediaLabel}>📺 {mediaLabel}</div>
-                          {desc && (
-                            <div className={styles.desc}>“{desc}”</div>
-                          )}
+                        );
+                      })}
+
+                      {/* 페이지네이션 UI */}
+                      {totalPages > 1 && (
+                        <div className={styles.pagination}>
+                          <button
+                            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                            disabled={currentPage === 1}
+                            className={styles.pageButton}
+                          >
+                            ◀
+                          </button>
+                          <span className={styles.pageInfo}>
+                            {currentPage} / {totalPages}
+                          </span>
+                          <button
+                            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                            disabled={currentPage === totalPages}
+                            className={styles.pageButton}
+                          >
+                            ▶
+                          </button>
                         </div>
-                      </div>
-                    );
-                  });
+                      )}
+                    </>
+                  );
                 })()
               )}
             </div>
