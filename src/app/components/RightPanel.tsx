@@ -50,7 +50,12 @@ export default function RightPanel({
     <aside className={styles.rightPanel}>
       <div className={styles.header}>
         <div className={styles.title}>
-          {activeTab === 'list' ? '리스트' : '디스커버리'}
+          {activeTab === 'list' ? (
+            <>
+              리스트
+              <span className={styles.countBadge}>{places.length}</span>
+            </>
+          ) : '디스커버리'}
           {activeMediaFilters.length > 0 && (
             <button
               className={styles.resetFilterButton}
