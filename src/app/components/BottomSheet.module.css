@@ -184,6 +184,7 @@
   overflow-y: auto;
   padding: 0 16px;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   /* [UX] 하단 InfoBar 및 Safe Area를 고려한 여부 확보 */
   padding-bottom: calc(40px + env(safe-area-inset-bottom) + 60px);
 }

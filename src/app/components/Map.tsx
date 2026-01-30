@@ -116,8 +116,6 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
 
         const handleIdle = () => {
             calculateVisible();
-            // [FIX] idle 이벤트 시 onManualInteraction 호출 제거 (키보드 플리커 방지)
-            // 브라우저 리사이즈 등으로 idle이 발생할 때 키보드가 닫히는 원인이 됨
             if (onMapStateChange) {
                 const center = map.getCenter();
                 onMapStateChange({ lat: center.getLat(), lng: center.getLng() }, map.getLevel());
@@ -126,32 +124,39 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         };
 
         window.kakao.maps.event.addListener(map, 'idle', handleIdle);
-        window.kakao.maps.event.addListener(map, 'click', () => {
-            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
-        });
-        window.kakao.maps.event.addListener(map, 'dragstart', () => {
-            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
-        });
-        window.kakao.maps.event.addListener(map, 'zoom_start', () => {
-            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
-        });
-        window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
-            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
-        });
-        // [UX] 모바일 전용: 지도 터치 즉시 키보드 닫기 (이벤트 전파 가로채기 대비)
-        window.kakao.maps.event.addListener(map, 'touchstart', () => {
-            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
-        });
-
-        calculateVisible();
+        calculateVisible(); // 초기 1회 실행
 
         return () => {
-            if (map) {
-                window.kakao.maps.event.removeListener(map, 'idle', handleIdle);
-                // click/dragstart는 간단히 정리하거나 무시 (이벤트가 많지 않으므로)
+            if (mapRef.current) {
+                window.kakao.maps.event.removeListener(mapRef.current, 'idle', handleIdle);
             }
         };
     }, [isSdkLoaded, onMapStateChange, calculateVisible]);
+
+    // [UX] 모바일 키보드 및 브라우저 안정화 로직
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const handleInteraction = (e: MouseEvent | TouchEvent) => {
+            // [중요] 버블링 단계에서 처리하여 UI의 stopPropagation을 존중함
+            const active = document.activeElement;
+            if (active instanceof HTMLElement && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+                active.blur();
+            }
+            if (propsRef.current.onManualInteraction) {
+                propsRef.current.onManualInteraction();
+            }
+        };
+
+        container.addEventListener('touchstart', handleInteraction, { passive: true });
+        container.addEventListener('mousedown', handleInteraction);
+
+        return () => {
+            container.removeEventListener('touchstart', handleInteraction);
+            container.removeEventListener('mousedown', handleInteraction);
+        };
+    }, []);
 
     // [중요] 필터 등으로 places가 변경되면 지도가 움직이지 않아도 가시성 재계산
     useEffect(() => {
@@ -333,5 +338,5 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         });
     }, [searchKeyword, searchTrigger, isSdkLoaded]);
 
-    return <div ref={containerRef} style={{ width: "100%", height: "100dvh" }} />;
+    return <div ref={containerRef} style={{ width: "100%", height: "100dvh", touchAction: 'none' }} />;
 }
