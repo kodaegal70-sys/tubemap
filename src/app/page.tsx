@@ -124,6 +124,7 @@ function HomeContent() {
   const [focusedPlace, setFocusedPlace] = useState<Place | null>(null);
   const [currentSearch, setCurrentSearch] = useState<string>('');
   const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [searchTrigger, setSearchTrigger] = useState(0);
   const [fitBoundsTrigger, setFitBoundsTrigger] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
   const [isMobileView, setIsMobileView] = useState<boolean>(false);
@@ -236,6 +237,7 @@ function HomeContent() {
       // 2) 업체명 일치가 없거나 검색어가 짧은 경우 (지역 검색 혹은 주소 검색)
       setCurrentSearch(trimmed);
       setSearchKeyword(trimmed);
+      setSearchTrigger(prev => prev + 1);
     } else {
       // 검색어가 없으면 초기화
       setCurrentSearch('');
@@ -358,6 +360,7 @@ function HomeContent() {
             <MobileShell
               allPlaces={allPlaces}
               currentSearch={currentSearch}
+              searchTrigger={searchTrigger}
               onMapMove={handleMapMove}
               onManualInteraction={handleManualInteraction}
             />

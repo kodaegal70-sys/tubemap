@@ -15,6 +15,7 @@ type Props = {
     mobileSheetState?: 'peek' | 'half' | 'full';
     myLocation?: { lat: number; lng: number } | null;
     searchKeyword?: string;
+    searchTrigger?: number;
 };
 
 declare global { interface Window { kakao: any; } }
@@ -22,7 +23,7 @@ declare global { interface Window { kakao: any; } }
 const BASE_IMAGE_SRC = "/images/logo.png";
 const ACTIVE_IMAGE_SRC = "/images/logo.png";
 
-export default function MapComponent({ places, focusedPlace, onMapMove, onMapStateChange, onMarkerClick, onManualInteraction, fitBoundsTrigger, isMobile, mobileSheetState, myLocation, searchKeyword }: Props) {
+export default function MapComponent({ places, focusedPlace, onMapMove, onMapStateChange, onMarkerClick, onManualInteraction, fitBoundsTrigger, isMobile, mobileSheetState, myLocation, searchKeyword, searchTrigger }: Props) {
     const mapRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isSdkLoaded, setIsSdkLoaded] = useState(false);
@@ -115,9 +116,8 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
 
         const handleIdle = () => {
             calculateVisible();
-            if (!isProgrammaticMove.current && propsRef.current.onManualInteraction) {
-                propsRef.current.onManualInteraction();
-            }
+            // [FIX] idle 이벤트 시 onManualInteraction 호출 제거 (키보드 플리커 방지)
+            // 브라우저 리사이즈 등으로 idle이 발생할 때 키보드가 닫히는 원인이 됨
             if (onMapStateChange) {
                 const center = map.getCenter();
                 onMapStateChange({ lat: center.getLat(), lng: center.getLng() }, map.getLevel());
@@ -331,7 +331,7 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
                 });
             }
         });
-    }, [searchKeyword, isSdkLoaded]);
+    }, [searchKeyword, searchTrigger, isSdkLoaded]);
 
     return <div ref={containerRef} style={{ width: "100%", height: "100dvh" }} />;
 }

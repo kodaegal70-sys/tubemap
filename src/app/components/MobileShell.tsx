@@ -14,11 +14,12 @@ const MapComponent = dynamic(() => import('./Map'), { ssr: false });
 interface MobileShellProps {
   allPlaces: Place[];
   currentSearch: string;
+  searchTrigger: number;
   onMapMove: (visible: Place[]) => void;
   onManualInteraction: () => void;
 }
 
-export default function MobileShell({ allPlaces, currentSearch, onMapMove, onManualInteraction }: MobileShellProps) {
+export default function MobileShell({ allPlaces, currentSearch, searchTrigger: parentSearchTrigger, onMapMove, onManualInteraction }: MobileShellProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const placeIdParam = searchParams.get('placeId');
@@ -40,6 +41,13 @@ export default function MobileShell({ allPlaces, currentSearch, onMapMove, onMan
 
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
+  const [searchTrigger, setSearchTrigger] = useState<number>(0);
+
+  // 부모의 searchTrigger와 동기화
+  useEffect(() => {
+    setSearchTrigger(parentSearchTrigger);
+  }, [parentSearchTrigger]);
+
 
   // URL 파라미터와 동기화
   useEffect(() => {
@@ -163,6 +171,7 @@ export default function MobileShell({ allPlaces, currentSearch, onMapMove, onMan
         // [중요] 지역 검색을 위해 기존 선택된 업체 해제 및 키워드 설정
         setSelectedPlaceId(null);
         setSearchKeyword(trimmed);
+        setSearchTrigger(prev => prev + 1);
       }
 
       setSheetState('half');
@@ -257,6 +266,7 @@ export default function MobileShell({ allPlaces, currentSearch, onMapMove, onMan
         mobileSheetState={sheetState}
         myLocation={myLocation}
         searchKeyword={searchKeyword}
+        searchTrigger={searchTrigger}
       />
 
       {/* 상단 검색바 + 카테고리 칩 */}
