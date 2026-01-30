@@ -118,9 +118,16 @@ export default function BottomSheet({
       {/* 헤더 영역 */}
       <div
         className={styles.sheetHeader}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
+        onTouchStart={(e) => {
+          e.stopPropagation();
+          handleTouchStart(e);
+        }}
+        onTouchMove={(e) => {
+          e.stopPropagation();
+          handleTouchMove(e);
+        }}
         onTouchEnd={handleTouchEnd}
+        onPointerDown={(e) => e.stopPropagation()}
       >
         {/* 드래그 핸들 */}
         <div className={styles.dragHandle}>

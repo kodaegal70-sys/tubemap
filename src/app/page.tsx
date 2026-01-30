@@ -316,7 +316,13 @@ function HomeContent() {
 
   return (
     <MobileProvider>
-      <main style={{ width: '100vw', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
+      <main style={{
+        width: '100vw',
+        height: '100dvh',
+        position: 'relative',
+        overflow: 'hidden',
+        overscrollBehavior: 'none'
+      }}>
         {/* 데스크톱 레이아웃 (조건부 마운트) */}
         {!isMobileView && (
           <div className="hide-mobile" style={{ height: '100%' }}>

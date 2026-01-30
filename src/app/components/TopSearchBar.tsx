@@ -27,7 +27,12 @@ const TopSearchBar = memo(function TopSearchBar({ value = '', onSearch, onCatego
     };
 
     return (
-        <div className={styles.searchWrapper}>
+        <div
+            className={styles.searchWrapper}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+        >
             <div className={styles.searchBar}>
                 <div className={styles.brand}>
                     <div className={styles.brandLogo} />
