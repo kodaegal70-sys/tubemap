@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 type Props = {
-    type: 'SIDEBAR' | 'SIDEBAR_TOP' | 'FILTER' | 'MAP_BOTTOM' | 'SIDEBAR_BOTTOM';
+    type: 'SIDEBAR' | 'SIDEBAR_TOP' | 'FILTER' | 'MAP_BOTTOM' | 'SIDEBAR_BOTTOM' | 'MOBILE_TOP';
     id: string;
 };
 
@@ -85,6 +85,24 @@ export default function AdSlot({ type, id }: Props) {
                     left: '50%',
                     transform: 'translateX(-50%)',
                     zIndex: 3000 // InfoBar(3500)보다는 낮게, 맵보다는 높게
+                };
+            case 'MOBILE_TOP':
+                return {
+                    position: 'fixed',
+                    top: '0',
+                    left: '0',
+                    right: '0',
+                    height: '60px',
+                    backgroundColor: '#fff',
+                    borderBottom: '1px solid #eee',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    color: '#999',
+                    zIndex: 5000, // 최상단 (검색바 4000보다 높게)
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                    pointerEvents: 'auto'
                 };
             default:
                 return {};

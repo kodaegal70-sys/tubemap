@@ -8,6 +8,7 @@ import { Place, DUMMY_PLACES, checkCategoryMatch } from '@/data/places';
 import { normalizeMediaName } from '@/lib/v3/utils/media';
 import TopSearchBar from './TopSearchBar';
 import BottomSheet from './BottomSheet';
+import AdSlot from './AdSlot';
 
 const MapComponent = dynamic(() => import('./Map'), { ssr: false });
 
@@ -254,6 +255,8 @@ export default function MobileShell({ allPlaces, currentSearch, searchTrigger: p
 
   return (
     <div style={{ width: '100vw', height: '100dvh', position: 'relative', overflow: 'hidden' }}>
+      <AdSlot type="MOBILE_TOP" id="mobile-top-ad" />
+      <div style={{ height: '60px', width: '100%', pointerEvents: 'none' }} />
       {/* 지도 - 항상 배경에 고정 */}
       <MapComponent
         places={filteredPlaces}
