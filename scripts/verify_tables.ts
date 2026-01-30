@@ -8,8 +8,7 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 async function checkTables() {
     const supabase = getSupabaseClient();
     if (!supabase) {
-        console.error("❌ Supabase Client Failed");
-        return;
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
     }
 
     console.log("🔍 Verifying v1.6 Tables...");

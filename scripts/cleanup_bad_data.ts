@@ -7,6 +7,9 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 async function cleanup() {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
 
     // 1. Delete items with pending images
     const { error: err1, count } = await supabase

@@ -7,6 +7,9 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 async function cleanup() {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
 
     // Delete known bad names
     const badNames = ['ENG', '소풍LIVE', 'undefined', 'null'];

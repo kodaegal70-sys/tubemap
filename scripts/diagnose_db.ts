@@ -75,6 +75,9 @@ import { getSupabaseClient } from '../src/lib/supabaseClient';
 
 async function checkColumn() {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
 
     // Check if column exists in schema
     // Postgrest doesn't let us query information_schema easily unless exposed.

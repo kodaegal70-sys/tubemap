@@ -25,6 +25,7 @@ export default function FixCoordsPage() {
 
     const fetchPlaces = async () => {
         setStatus('Fetching Places...');
+        if (!supabase) return;
         const { data } = await supabase.from('places').select('*').gt('id', 0); // All places
         if (data) {
             setPlaces(data);
@@ -62,6 +63,7 @@ export default function FixCoordsPage() {
 
             // Helper function for DB update
             const updateDB = async (newLat: number, newLng: number, source: string) => {
+                if (!supabase) return;
                 const drift = place.lat ? getDistanceFromLatLonInKm(place.lat, place.lng, newLat, newLng) : 0;
                 totalDrift += drift;
 

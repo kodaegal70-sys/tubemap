@@ -1,8 +1,9 @@
 
-import { getSupabaseClient } from './src/lib/supabaseClient';
+import { getSupabaseClient } from '../src/lib/supabaseClient';
 
 async function checkData() {
     const supabase = getSupabaseClient();
+    if (!supabase) return; // Silent return is fine for this small inspector
     const { data, error } = await supabase.from('places').select('*').limit(1).order('created_at', { ascending: false });
 
     if (error) {

@@ -7,6 +7,9 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 async function listVideos() {
     const supabase = getSupabaseClient();
+    if (!supabase) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
     const { data: videos, error } = await supabase
         .from('processed_videos')
         .select('*');

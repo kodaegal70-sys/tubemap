@@ -21,13 +21,13 @@ export default function MapNaverComponent({ places, focusedPlace, onMapMove, onM
     const containerRef = useRef<HTMLDivElement>(null);
     const [isSdkLoaded, setIsSdkLoaded] = useState(false);
     const markersRef = useRef<any[]>([]);
-    const [activePlaceId, setActivePlaceId] = useState<number | null>(null);
+    const [activePlaceId, setActivePlaceId] = useState<number | string | null>(null);
 
     // 1. SDK Loading
     useEffect(() => {
         const clientId = process.env.NEXT_PUBLIC_NAVER_MAP_CLIENT_ID;
         console.log('Naver Map Client ID:', clientId ? 'exists' : 'missing');
-        
+
         if (!clientId) {
             console.error('Naver Map Client ID is missing');
             return;
@@ -37,7 +37,7 @@ export default function MapNaverComponent({ places, focusedPlace, onMapMove, onM
             setIsSdkLoaded(true);
             return;
         }
-        
+
         console.log('Loading Naver SDK...');
         const script = document.createElement('script');
         script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${clientId}`;

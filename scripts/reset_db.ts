@@ -7,6 +7,9 @@ dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 async function resetVideos() {
     const db = getSupabaseClient();
+    if (!db) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
     console.log("Resetting processed videos...");
 
     // Reset all for simplicity in test env, or target specific IDs if possible.

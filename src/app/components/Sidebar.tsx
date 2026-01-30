@@ -186,7 +186,7 @@ export default function Sidebar({ places, onPlaceClick, onSearch, onMoveToCurren
                                 <div className={styles.itemContent}>
                                     <div className={styles.itemName} style={{ fontSize: '18px', marginBottom: '4px' }}>{place.name}</div>
                                     <div style={{ fontSize: '13px', color: '#e53935', fontWeight: 'bold', marginBottom: '4px' }}>
-                                        📺 {place.category === '촬영지' ? place.media.split('|')[0] : place.media.split('|').join(', ')}
+                                        📺 {place.category === '촬영지' ? (place.media?.split('|')[0] || '') : (place.media?.split('|').join(', ') || '')}
                                     </div>
                                     {place.phone && place.phone.trim().length > 3 && (
                                         <div style={{ fontSize: '12px', color: '#666', marginBottom: '4px' }}>

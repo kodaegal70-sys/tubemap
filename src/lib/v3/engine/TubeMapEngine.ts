@@ -171,7 +171,6 @@ export class TubeMapEngine {
                 kakao_place_id: place.id,
                 name_official: place.place_name,
                 name: place.place_name,
-                category: place.category_name,
                 category: place.category_name, // Whole path: "음식점 > 한식 > 국밥 > 순대국"
                 // menu_primary: "", // Removed: Column missing in DB schema
                 address: place.address_name,

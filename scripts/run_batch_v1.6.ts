@@ -28,6 +28,10 @@ async function runBatch() {
     const engine = new TubeMapEngine();
     const supabase = getSupabaseClient();
 
+    if (!supabase) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
+
     let initialCount = 0;
     const { count: startCount } = await supabase.from('places').select('*', { count: 'exact', head: true });
     initialCount = startCount || 0;
