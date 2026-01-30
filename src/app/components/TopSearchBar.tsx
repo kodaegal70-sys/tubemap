@@ -45,6 +45,10 @@ const TopSearchBar = memo(function TopSearchBar({ value = '', onSearch, onCatego
                         value={text}
                         onChange={(e) => setText(e.target.value)}
                         onKeyDown={handleKeyDown}
+                        inputMode="search"
+                        enterKeyHint="search"
+                        autoCorrect="off"
+                        spellCheck={false}
                     />
                 </div>
             </div>

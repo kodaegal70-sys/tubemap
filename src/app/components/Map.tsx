@@ -132,7 +132,14 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         window.kakao.maps.event.addListener(map, 'dragstart', () => {
             if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
         });
+        window.kakao.maps.event.addListener(map, 'zoom_start', () => {
+            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
+        });
         window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
+            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
+        });
+        // [UX] 모바일 전용: 지도 터치 즉시 키보드 닫기 (이벤트 전파 가로채기 대비)
+        window.kakao.maps.event.addListener(map, 'touchstart', () => {
             if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
         });
 
