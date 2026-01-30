@@ -13,6 +13,14 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+};
+
 export const metadata: Metadata = {
   title: "TubeMap - 유튜브 맛집을 지도로 찾기",
   description: "수요미식회, 식객 허영만, 쯔양, 히밥 등 유명 유튜버와 방송에 소개된 맛집을 지도에서 한눈에 찾아보세요. 전국 검증된 맛집 정보를 제공합니다.",

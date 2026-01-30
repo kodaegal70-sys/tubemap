@@ -72,6 +72,7 @@ export default function BottomSheet({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging.current) return;
+    if (e.cancelable) e.preventDefault(); // 브라우저 스크롤/툴바 동작 방지
     currentY.current = e.touches[0].clientY;
   };
 

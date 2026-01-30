@@ -136,6 +136,8 @@
 /* 모바일 전용: 좌우 여백 동일하게, 칩/버튼 크기 조정 */
 @media (max-width: 768px) {
     .searchWrapper {
+        top: calc(18px + env(safe-area-inset-top));
+        left: 10px;
         right: 10px;
         max-width: none;
     }

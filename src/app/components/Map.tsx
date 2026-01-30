@@ -132,6 +132,9 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         window.kakao.maps.event.addListener(map, 'dragstart', () => {
             if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
         });
+        window.kakao.maps.event.addListener(map, 'zoom_changed', () => {
+            if (propsRef.current.onManualInteraction) propsRef.current.onManualInteraction();
+        });
 
         calculateVisible();
 
@@ -142,6 +145,37 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
             }
         };
     }, [isSdkLoaded, onMapStateChange, calculateVisible]);
+
+    // [UX] 모바일 키보드 제어: 지도 조작 시 즉시 포커스 해제 (Capture 단계)
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const handleFocusBlur = (e: Event) => {
+            // 현재 포커스된 요소가 INPUT이나 TEXTAREA인 경우에만 blur
+            const active = document.activeElement;
+            if (active instanceof HTMLElement && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+                active.blur();
+            }
+            // 부모의 수동 조작 핸들러 호출
+            if (propsRef.current.onManualInteraction) {
+                propsRef.current.onManualInteraction();
+            }
+        };
+
+        // Capture 단계에서 이벤트를 가로채서 즉시 효과 발생
+        container.addEventListener('touchstart', handleFocusBlur, { capture: true, passive: true });
+        container.addEventListener('touchmove', handleFocusBlur, { capture: true, passive: true });
+        container.addEventListener('mousedown', handleFocusBlur, { capture: true });
+        container.addEventListener('pointerdown', handleFocusBlur, { capture: true });
+
+        return () => {
+            container.removeEventListener('touchstart', handleFocusBlur, { capture: true });
+            container.removeEventListener('touchmove', handleFocusBlur, { capture: true });
+            container.removeEventListener('mousedown', handleFocusBlur, { capture: true });
+            container.removeEventListener('pointerdown', handleFocusBlur, { capture: true });
+        };
+    }, []);
 
     // [중요] 필터 등으로 places가 변경되면 지도가 움직이지 않아도 가시성 재계산
     useEffect(() => {

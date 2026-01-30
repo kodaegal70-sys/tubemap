@@ -78,6 +78,7 @@ function DesktopLayout({
       {/* 좌측 상단 플로팅 검색/카테고리 (직방식 상단 패널) */}
       <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 1100 }}>
         <TopSearchBar
+          value={currentSearch}
           onSearch={handleSearch}
           onCategoryToggle={(c: string) => {
             const isSelecting = !activeCategoryFilters.includes(c);
@@ -243,14 +244,18 @@ function HomeContent() {
     }
   }, [allPlaces, router]);
 
-  // [INTERACTION] 수동 조작 시 즉시 상세 및 검색 해제 (탐색 모드로 복원)
+  // [INTERACTION] 수동 조작 시 상세 해제 및 키보드 닫기 (검색어는 유지)
   const handleManualInteraction = useCallback(() => {
-    if (placeIdParam || currentSearch || searchKeyword) {
-      setCurrentSearch('');
-      setSearchKeyword('');
+    // 키보드 닫기
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    if (placeIdParam) {
+      // 업체 상세만 해제하고 검색어는 유지함 (유저 피드백 반영)
       router.replace('/', { scroll: false });
     }
-  }, [placeIdParam, currentSearch, searchKeyword, router]);
+  }, [placeIdParam, router]);
 
   const handleMarkerClick = useCallback((p: Place) => {
     router.push(`?placeId=${p.id}`, { scroll: false });
@@ -346,6 +351,7 @@ function HomeContent() {
           <div className="hide-desktop" style={{ height: '100%' }}>
             <MobileShell
               allPlaces={allPlaces}
+              currentSearch={currentSearch}
               onMapMove={handleMapMove}
               onManualInteraction={handleManualInteraction}
             />

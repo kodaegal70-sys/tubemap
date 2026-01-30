@@ -13,11 +13,12 @@ const MapComponent = dynamic(() => import('./Map'), { ssr: false });
 
 interface MobileShellProps {
   allPlaces: Place[];
+  currentSearch: string;
   onMapMove: (visible: Place[]) => void;
   onManualInteraction: () => void;
 }
 
-export default function MobileShell({ allPlaces, onMapMove, onManualInteraction }: MobileShellProps) {
+export default function MobileShell({ allPlaces, currentSearch, onMapMove, onManualInteraction }: MobileShellProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const placeIdParam = searchParams.get('placeId');
@@ -231,9 +232,14 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
     return allPlaces.find(p => p.id === selectedPlaceId) || null;
   }, [selectedPlaceId, allPlaces]);
 
-  // 수동 조작 시 로컬 검색 상태도 초기화
+  // 수동 조작 시 키보드 닫기 및 검색 상태 유지 (유저 피드백 반영)
   const handleInternalManualInteraction = useCallback(() => {
-    setSearchKeyword('');
+    // 키보드 닫기
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+
+    // searchKeyword를 초기화하지 않음 (글자 유지)
     if (onManualInteraction) onManualInteraction();
   }, [onManualInteraction]);
 
@@ -255,6 +261,7 @@ export default function MobileShell({ allPlaces, onMapMove, onManualInteraction 
 
       {/* 상단 검색바 + 카테고리 칩 */}
       <TopSearchBar
+        value={currentSearch}
         onSearch={handleSearch}
         onCategoryToggle={handleCategoryToggle}
         selectedCategories={categoryFilter}

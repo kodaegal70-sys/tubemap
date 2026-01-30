@@ -1,20 +1,29 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, memo } from 'react';
 import styles from './TopSearchBar.module.css';
 
 type Props = {
+    value?: string;
     onSearch: (keyword: string) => void;
     onCategoryToggle: (category: string) => void;
     selectedCategories: string[];
     onMyLocation?: () => void;
 };
 
-export default function TopSearchBar({ onSearch, onCategoryToggle, selectedCategories, onMyLocation }: Props) {
-    const [text, setText] = useState('');
+const TopSearchBar = memo(function TopSearchBar({ value = '', onSearch, onCategoryToggle, selectedCategories, onMyLocation }: Props) {
+    const [text, setText] = useState(value);
 
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') onSearch(text);
+    // 부모의 value가 바뀌면 내부 text도 동기화 (검색 초기화 등 대응)
+    useEffect(() => {
+        setText(value);
+    }, [value]);
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            onSearch(text);
+            e.currentTarget.blur(); // 키보드 닫기
+        }
     };
 
     return (
@@ -65,4 +74,6 @@ export default function TopSearchBar({ onSearch, onCategoryToggle, selectedCateg
             )}
         </div>
     );
-}
+});
+
+export default TopSearchBar;
