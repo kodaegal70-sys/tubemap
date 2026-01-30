@@ -22,9 +22,9 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "TubeMap - 유튜브 맛집을 지도로 찾기",
-  description: "수요미식회, 식객 허영만, 쯔양, 히밥 등 유명 유튜버와 방송에 소개된 맛집을 지도에서 한눈에 찾아보세요. 전국 검증된 맛집 정보를 제공합니다.",
-  keywords: ["맛집", "유튜브 맛집", "지도", "수요미식회", "식객 허영만", "쯔양", "히밥", "먹방", "맛집 추천", "TubeMap"],
+  title: "TubeMap(튜브맵) - 유튜브 맛집을 지도로 찾기",
+  description: "수요미식회, 식객 허영만, 쯔양, 히밥 등 유명 유튜버와 방송에 소개된 맛집을 튜브맵(TubeMap) 지도에서 한눈에 찾아보세요. 전국 검증된 맛집 정보를 제공합니다.",
+  keywords: ["튜브맵", "TubeMap", "맛집", "유튜브 맛집", "지도", "수요미식회", "식객 허영만", "쯔양", "히밥", "먹방", "맛집 추천"],
   authors: [{ name: "TubeMap" }],
   openGraph: {
     title: "TubeMap - 유튜브 맛집을 지도로 찾기",
