@@ -29,6 +29,8 @@ const TopSearchBar = memo(function TopSearchBar({ value = '', onSearch, onCatego
     return (
         <div
             className={styles.searchWrapper}
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             onTouchStart={(e) => e.stopPropagation()}
             onTouchMove={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}

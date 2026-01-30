@@ -30,6 +30,7 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
 
     // [STABILITY] 최신 props를 항상 참조할 수 있도록 Ref 사용
     const propsRef = useRef({ places, onMapMove, onManualInteraction, isMobile, mobileSheetState });
+    const lastFocusTime = useRef<number>(0);
     useEffect(() => {
         propsRef.current = { places, onMapMove, onManualInteraction, isMobile, mobileSheetState };
     }, [places, onMapMove, onManualInteraction, isMobile, mobileSheetState]);
@@ -138,8 +139,18 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         const container = containerRef.current;
         if (!container) return;
 
+        // 포커스 시점 기록 (키보드 올라올 때의 간섭 방지)
+        const handleFocusIn = () => {
+            lastFocusTime.current = Date.now();
+        };
+        document.addEventListener('focusin', handleFocusIn);
+
         const handleInteraction = (e: MouseEvent | TouchEvent) => {
-            // [중요] 버블링 단계에서 처리하여 UI의 stopPropagation을 존중함
+            // [방어] 포커스 직후(400ms 이내) 발생하는 이벤트는 무시 (키보드 플리커 방지)
+            if (Date.now() - lastFocusTime.current < 400) return;
+
+            // [방어] 이벤트 타겟이 지도 컨테이너 본인이거나 그 내부인 경우에만 작동
+            // (UI 요소와의 간섭을 한 번 더 차단)
             const active = document.activeElement;
             if (active instanceof HTMLElement && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
                 active.blur();
@@ -149,10 +160,12 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
             }
         };
 
+        // passive: true는 preventDefault를 못하게 하지만 스크롤 성능에 좋음
         container.addEventListener('touchstart', handleInteraction, { passive: true });
         container.addEventListener('mousedown', handleInteraction);
 
         return () => {
+            document.removeEventListener('focusin', handleFocusIn);
             container.removeEventListener('touchstart', handleInteraction);
             container.removeEventListener('mousedown', handleInteraction);
         };
@@ -338,5 +351,5 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         });
     }, [searchKeyword, searchTrigger, isSdkLoaded]);
 
-    return <div ref={containerRef} style={{ width: "100%", height: "100dvh", touchAction: 'none' }} />;
+    return <div ref={containerRef} style={{ width: "100%", height: "100%", touchAction: 'pan-x pan-y' }} />;
 }
