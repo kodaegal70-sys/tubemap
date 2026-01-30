@@ -7,7 +7,14 @@ dotenv.config({ path: path.join(__dirname, '..', '.env.local') });
 
 async function checkCount() {
     const supabase = getSupabaseClient();
-    const { data, error } = await supabase.from('places').select('id, name, media, media_label, image_url, image_state');
+
+    if (!supabase) {
+        throw new Error("Supabase client not initialized. Check env vars or initialization logic.");
+    }
+
+    const { data, error } = await supabase
+        .from("places")
+        .select("id, name, media, media_label, image_url, image_state");
 
     if (error) {
         console.error("❌ DB Error:", error.message);
