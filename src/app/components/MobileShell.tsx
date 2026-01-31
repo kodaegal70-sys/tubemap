@@ -27,6 +27,7 @@ interface MobileShellProps {
 export default function MobileShell({
   allPlaces,
   currentSearch,
+  onCurrentSearchChange,
   searchTrigger: parentSearchTrigger,
   onMapMove,
   onManualInteraction,
