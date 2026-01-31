@@ -284,23 +284,40 @@ function HomeContent() {
     );
   }, []);
 
-  const ENABLE_OFFLINE_MODE = true;
+  const ENABLE_OFFLINE_MODE = false; // [MOD] 이제 DB가 정상이므로 오프라인 모드 해제
+
   useEffect(() => {
-    if (ENABLE_OFFLINE_MODE) {
-      const fetchOfflineData = () => {
+    const fetchPlaces = async () => {
+      try {
+        // 1. Supabase에서 최신 데이터 가져오기
+        const { data, error } = await supabase!
+          .from('places')
+          .select('*')
+          .order('updated_at', { ascending: false });
+
+        if (error) throw error;
+
+        if (data) {
+          setAllPlaces(data.map(p => ({ ...p, id: p.id || p.kakao_place_id })));
+          return;
+        }
+      } catch (e) {
+        console.error("Supabase fetch failed, falling back to offline", e);
+
+        // 2. Fallback: 오프라인 데이터 가져오기
         fetch('/api/offline-places')
           .then(res => res.json())
           .then(raw => {
             if (Array.isArray(raw)) {
               setAllPlaces(raw.map(p => ({ ...p, id: p.id || p.kakao_place_id })));
             }
-          })
-          .catch(e => console.error("Live sync failed", e));
-      };
-      fetchOfflineData();
-      const interval = setInterval(fetchOfflineData, 5000);
-      return () => clearInterval(interval);
-    }
+          });
+      }
+    };
+
+    fetchPlaces();
+    const interval = setInterval(fetchPlaces, 10000); // 10초마다 갱신
+    return () => clearInterval(interval);
   }, [supabase]);
 
   if (!mounted) return null;
