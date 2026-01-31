@@ -22,7 +22,7 @@ export class CuratedCollector {
     /**
      * 링크 쌍(유튜브, 카카오)을 처리하여 정보를 추출하고 DB 또는 로컬 파일에 저장
      */
-    async processLinkPair(youtubeUrl: string, kakaoUrl: string, preFetchedKakao?: any) {
+    async processLinkPair(youtubeUrl: string, kakaoUrl: string, preFetchedKakao?: any): Promise<{ status: string, name: string, reason?: string }> {
         try {
             const videoId = this.extractVideoId(youtubeUrl);
             const kakaoId = this.kakao.extractPlaceId(kakaoUrl);
@@ -133,7 +133,7 @@ export class CuratedCollector {
 
         } catch (error: any) {
             console.error(`[CuratedCollector] 🚨 수집 처리 중 오류:`, error.message);
-            return { status: 'error', name: '수집 실패' };
+            return { status: 'error', name: '수집 실패', reason: error.message };
         }
     }
 
