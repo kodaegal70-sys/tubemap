@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "대박물갈비",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 중구 퇴계로4길 7 1층",
+        "geocodeAddress": "서울 중구 퇴계로4길 7 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.55753475679495,
+      "lon": 126.97772686181953
+    },
+    "phonenum": "02-755-6974",
+    "menu_items": [
+      "물갈비",
+      "맛있는 노석들 (Tasty Guys) 언급",
+      "프라이빗룸"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

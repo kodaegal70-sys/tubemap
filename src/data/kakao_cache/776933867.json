@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "오목골즉석메밀우동",
+    "address": {
+      "addressname": {
+        "fullAddress": "인천 미추홀구 석정로 142 1층",
+        "geocodeAddress": "인천 미추홀구 석정로 142 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.46835594494953,
+      "lon": 126.65085698578092
+    },
+    "phonenum": "032-868-1717",
+    "menu_items": [
+      "쫄깃한 메밀면과 깊은 국물의 조화",
+      "메밀우동 추천",
+      "맛있는 노석들 (Tasty Guys) 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "다미",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 영등포구 국제금융로8길 34 오륜빌딩 1층",
+        "geocodeAddress": "(37.56209, 126.98408)"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.5201301307501,
+      "lon": 126.927214075105
+    },
+    "phonenum": "02-783-5167",
+    "menu_items": [
+      "숯불 향 가득한 정갈한 생선구이",
+      "식객 허영만의 백반기행 언급",
+      "프라이빗룸"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

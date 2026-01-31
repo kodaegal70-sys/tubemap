@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "보건옥",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 중구 창경궁로8길 12",
+        "geocodeAddress": "서울 중구 창경궁로8길 12"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.5685290082279,
+      "lon": 126.99875940309
+    },
+    "phonenum": "02-2275-3743",
+    "menu_items": [
+      "세월이 빛은 깊고 진한 한식 고기 맛",
+      "김치찌개(2인이상) 추천",
+      "맛있는 노석들 (Tasty Guys) 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "정의분식",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 도봉구 도봉로123길 78",
+        "geocodeAddress": "(04527) 서울특별시 도봉구 도봉로123길 78"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.6530623709396,
+      "lon": 127.033144224925
+    },
+    "phonenum": "02-998-5941",
+    "menu_items": [
+      "즉석떡볶이",
+      "오징어탕수",
+      "프라이빗룸"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "갈치바다 애월",
+    "address": {
+      "addressname": {
+        "fullAddress": "제주특별자치도 제주시 애월읍 애월로 15-1 1층",
+        "geocodeAddress": "제주특별자치도 제주시 애월읍 애월로 15-1 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 33.46041548257626,
+      "lon": 126.31099320078431
+    },
+    "phonenum": "0507-1490-0734",
+    "menu_items": [
+      "순살갈치조림",
+      "맛있는 노석들 (Tasty Guys) 언급",
+      "유아의자 있음"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

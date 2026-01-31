@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "경산식당",
+    "address": {
+      "addressname": {
+        "fullAddress": "대구 군위군 군위읍 중앙5길 8-19 1층",
+        "geocodeAddress": "대구 군위군 군위읍 중앙5길 8-19 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 36.23953866637572,
+      "lon": 128.56703418575339
+    },
+    "phonenum": "054-383-3080",
+    "menu_items": [
+      "국밥 한 그릇",
+      "고디탕 추천",
+      "단체석"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

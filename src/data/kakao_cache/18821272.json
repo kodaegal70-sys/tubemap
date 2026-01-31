@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "섬집",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 용산구 한강대로14길 8 2-4층",
+        "geocodeAddress": "서울 용산구 한강대로14길 8 2-4층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.52497665587376,
+      "lon": 126.96469635999026
+    },
+    "phonenum": "02-794-0087",
+    "menu_items": [
+      "참게꽃게매운탕",
+      "프라이빗룸",
+      "콜키지 부과"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "골드피쉬딤섬퀴진",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 강남구 압구정로48길 35 2층",
+        "geocodeAddress": "서울 강남구 압구정로48길 35 2층"
+      }
+    },
+    "category": {
+      "fullname": "중식"
+    },
+    "wgs84": {
+      "lat": 37.52607082269057,
+      "lon": 127.03710064350305
+    },
+    "phonenum": "02-797-7777",
+    "menu_items": [
+      "소룡포",
+      "단체석",
+      "콜키지 부과"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

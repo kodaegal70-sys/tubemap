@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "털보네꼼장어닭발",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 용산구 대사관로 63 1층",
+        "geocodeAddress": "서울 용산구 대사관로 63 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.5334836656135,
+      "lon": 127.005285908342
+    },
+    "phonenum": "02-749-2088",
+    "menu_items": [
+      "치레포",
+      "돼지불꼬랑지",
+      "전지적 참견 시점"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "두꺼비부대찌개",
+    "address": {
+      "addressname": {
+        "fullAddress": "경기 안양시 만안구 안양로147번길 11 1층",
+        "geocodeAddress": "경기 안양시 만안구 안양로147번길 11 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.3871098958442,
+      "lon": 126.930071004436
+    },
+    "phonenum": "031-442-1165",
+    "menu_items": [
+      "부대찌개(1인분) 추천",
+      "맛있는 노석들 (Tasty Guys) 언급",
+      "프라이빗룸"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -85,12 +85,12 @@ export class KakaoBrowserScraper {
       name, category, address_raw, address_geocode, phone, menus(3).
       
       Category Definitions (Strictly Choose One):
-      - 한식: Korean food, Kimchi, Stew, Bibimbap, Pork Belly (Samgyeopsal)
+      - 한식: Korean food, Kimchi, Stew(Jjigae), Bibimbap, Pork Belly (Samgyeopsal). Keyword: "찌개" -> 한식
       - 중식: Chinese food, Jajangmyeon, Jjamppong, Tangsuyuk, Mala
       - 일식: Japanese food, Sushi, Sashimi, Tonkatsu, Ramen, Udon, Omakase, Tuna, Raw Fish
-      - 양식: Western food, Steak, Pasta, Pizza, Burger, Salad
-      - 분식: Korean Snack, Tteokbokki, Gimbap, Ramyeon, Sundae
-      - 기타: Cafe, Coffee, Bakery, Dessert, Bar, Pub, Alcohol only
+      - 양식: Western food, Steak, Pasta, Pizza, Burger, Salad. Keywords: "스테이크", "피자", "샐러드", "파스타" -> 양식
+      - 분식: Korean Snack, Tteokbokki, Gimbap, Ramyeon, Sundae. Keyword: "떡볶이" -> 분식
+      - 기타: Cafe, Coffee, Bakery, Dessert, Bar, Pub, Alcohol only. Keywords: "빵", "커피", "카페", "디저트" -> 기타
       
       Phone Number Guidelines:
       - Valid formats: 02-xxxx-xxxx, 010-xxxx-xxxx, 031-xxx-xxxx

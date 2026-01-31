@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "신사랑방식당",
+    "address": {
+      "addressname": {
+        "fullAddress": "경북 구미시 금오산로 140 1층",
+        "geocodeAddress": "경북 구미시 금오산로 140 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 36.1246535151611,
+      "lon": 128.329368978578
+    },
+    "phonenum": "054-456-3326",
+    "menu_items": [
+      "북어물찜(2인이상) 추천",
+      "맛있는 노석들(Tasty Guys) 언급",
+      "프라이빗룸"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "그랜드 하얏트 서울",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 용산구 소월로 322",
+        "geocodeAddress": "서울 용산구 소월로 322"
+      }
+    },
+    "category": {
+      "fullname": "기타"
+    },
+    "wgs84": {
+      "lat": 37.539444767461234,
+      "lon": 126.99708075146782
+    },
+    "phonenum": "02-797-1234",
+    "menu_items": [
+      "스테이크",
+      "피자",
+      "샐러드"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

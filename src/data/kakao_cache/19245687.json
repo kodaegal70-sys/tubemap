@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "김가네낙지전문점",
+    "address": {
+      "addressname": {
+        "fullAddress": "경기 안산시 단원구 당곡로 33",
+        "geocodeAddress": "경기 안산시 단원구 당곡로 33"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.3204596831944,
+      "lon": 126.833369360857
+    },
+    "phonenum": "031-402-0552",
+    "menu_items": [
+      "간장낙지",
+      "낙지덮밥 추천",
+      "맛있는 녀석들"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

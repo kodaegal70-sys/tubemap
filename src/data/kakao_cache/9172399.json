@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "김태주선산곱창 구미본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "경북 구미시 송원서로 77 1층",
+        "geocodeAddress": "경북 구미시 송원서로 77 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 36.12463548102713,
+      "lon": 128.3432619548557
+    },
+    "phonenum": "0502-5553-2124",
+    "menu_items": [
+      "곱창전골",
+      "사골육수",
+      "전현무계획"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

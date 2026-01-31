@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "콩애가 일산본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "경기 고양시 일산동구 호수로 606 코오롱레이크폴리스 A동 1층",
+        "geocodeAddress": "경기 고양시 일산동구 호수로 606 코오롱레이크폴리스 A동 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.65649126765179,
+      "lon": 126.76881399730243
+    },
+    "phonenum": "031-905-8859",
+    "menu_items": [
+      "담백한 두부와 정갈한 한상 차림",
+      "청국장 추천",
+      "맛있는 노석들 (Tasty Guys) 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "별미 본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "인천 중구 참외전로 84-1 1층",
+        "geocodeAddress": "인천 중구 참외전로 84-1 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.4781303795846,
+      "lon": 126.628794976355
+    },
+    "phonenum": "032-763-1192",
+    "menu_items": [
+      "김치찌개",
+      "돼지갈비탕",
+      "해물탕"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

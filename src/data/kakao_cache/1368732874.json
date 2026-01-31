@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "시골집연탄석쇠구이",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 성북구 보국문로 209",
+        "geocodeAddress": "서울 성북구 보국문로 209"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.6179430007043,
+      "lon": 126.998332694784
+    },
+    "phonenum": "02-915-6547",
+    "menu_items": [
+      "돼지갈비 연탄구이정식 추천",
+      "맛있는 노석들 (Tasty Guys) 언급",
+      "테라스"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

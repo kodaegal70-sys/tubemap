@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "둔내 막국수 북한산본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 은평구 북한산로 255 1층",
+        "geocodeAddress": "서울 은평구 북한산로 255 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.653048001512765,
+      "lon": 126.93794298308956
+    },
+    "phonenum": "02-381-8870",
+    "menu_items": [
+      "막국수",
+      "비빔막국수",
+      "단체석"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

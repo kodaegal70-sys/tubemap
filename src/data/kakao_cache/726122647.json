@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "카페드아쿠아 스타필드하남",
+    "address": {
+      "addressname": {
+        "fullAddress": "경기 하남시 미사대로 750 스타필드 하남 3층",
+        "geocodeAddress": "경기 하남시 미사대로 750 스타필드 하남 3층"
+      }
+    },
+    "category": {
+      "fullname": "기타"
+    },
+    "wgs84": {
+      "lat": 37.545684548614744,
+      "lon": 127.22344621570753
+    },
+    "phonenum": "031-8072-8800",
+    "menu_items": [
+      "바다소금라떼 추천",
+      "바테이블",
+      "유아의자 있음"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

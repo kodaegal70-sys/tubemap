@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "송원식당",
+    "address": {
+      "addressname": {
+        "fullAddress": "인천 중구 연안부두로 24-1 1층",
+        "geocodeAddress": "인천 중구 연안부두로 24-1 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.45614775023254,
+      "lon": 126.60278067301942
+    },
+    "phonenum": "032-884-2838",
+    "menu_items": [
+      "밴댕이무침",
+      "생방송 투데이 언급",
+      "단체석"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

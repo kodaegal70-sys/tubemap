@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "일미장어",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 용산구 후암로57길 35-15 지하1층",
+        "geocodeAddress": "서울 용산구 후암로57길 35-15 지하1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.552157810329795,
+      "lon": 126.97431417197112
+    },
+    "phonenum": "02-777-4380",
+    "menu_items": [
+      "장어구이정식",
+      "장어덮밥",
+      "보해복분자"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

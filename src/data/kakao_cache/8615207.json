@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "해월정",
+    "address": {
+      "addressname": {
+        "fullAddress": "제주특별자치도 제주시 구좌읍 해맞이해안로 2340 1,2층",
+        "geocodeAddress": "제주특별자치도 제주시 구좌읍 해맞이해안로 2340 1,2층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 33.492262994490375,
+      "lon": 126.90963170684925
+    },
+    "phonenum": "064-782-5664",
+    "menu_items": [
+      "보말칼국수",
+      "맛있는 노석들(Tasty Guys)",
+      "고기구워주는 집"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

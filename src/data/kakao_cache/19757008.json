@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "한소끔",
+    "address": {
+      "addressname": {
+        "fullAddress": "전북특별자치도 군산시 백토로 284-8 1-2층",
+        "geocodeAddress": "전북특별자치도 군산시 백토로 284-8 1-2층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 35.95407759476871,
+      "lon": 126.70278451298499
+    },
+    "phonenum": "063-462-8181",
+    "menu_items": [
+      "전복과 꽃게 가득한 깊은 바다의 맛",
+      "맛있는 노석들 (Tasty Guys) 언급",
+      "테라스"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

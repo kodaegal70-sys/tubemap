@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "봉자막창 서울송파가락점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 송파구 송파대로30길 41-4 1층",
+        "geocodeAddress": "서울 송파구 송파대로30길 41-4 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.496467570376936,
+      "lon": 127.12146381687447
+    },
+    "phonenum": "02-421-3888",
+    "menu_items": [
+      "된장라면과 무한리필 사이드의 행복",
+      "봉자한판 추천",
+      "단체석"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

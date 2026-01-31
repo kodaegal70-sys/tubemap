@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "은하장",
+    "address": {
+      "addressname": {
+        "fullAddress": "경기 파주시 문산읍 문향로 78 2층",
+        "geocodeAddress": "경기 파주시 문산읍 문향로 78 2층"
+      }
+    },
+    "category": {
+      "fullname": "중식"
+    },
+    "wgs84": {
+      "lat": 37.858483124125584,
+      "lon": 126.785993411966
+    },
+    "phonenum": "031-952-4121",
+    "menu_items": [
+      "옛맛 가득한 고기튀김과 유니짜장의 조화",
+      "짬뽕 추천",
+      "맛있는 노석들 (Tasty Guys) 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

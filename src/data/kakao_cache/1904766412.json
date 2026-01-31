@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "스미스앤월렌스키",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 용산구 독서당로 71 7-8층",
+        "geocodeAddress": "서울특별시 용산구 독서당로 71, 7-8층"
+      }
+    },
+    "category": {
+      "fullname": "양식"
+    },
+    "wgs84": {
+      "lat": 37.5340565188995,
+      "lon": 127.008440320596
+    },
+    "phonenum": "02-6390-9880",
+    "menu_items": [
+      "통창 너머 펼쳐진 고급 스테이크의 향연",
+      "프라이빗룸",
+      "콜키지 부과"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}
