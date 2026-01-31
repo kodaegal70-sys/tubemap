@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "이조갈비",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 중구 다산로39길 11-12",
+        "geocodeAddress": "서울 중구 다산로39길 11-12"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.5639041670884,
+      "lon": 127.01486813273
+    },
+    "phonenum": "02-2253-3287",
+    "menu_items": [
+      "꽃게탕(대)",
+      "노포 감성 속 냉삼과 얼큰 꽃게탕",
+      "성시경 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

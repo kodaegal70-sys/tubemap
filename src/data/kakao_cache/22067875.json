@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "뉴델리",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 강남구 논현로176길 28",
+        "geocodeAddress": "서울 강남구 논현로176길 28"
+      }
+    },
+    "category": {
+      "fullname": "중식"
+    },
+    "wgs84": {
+      "lat": 37.527502569662175,
+      "lon": 127.03062459582749
+    },
+    "phonenum": "02-541-9300",
+    "menu_items": [
+      "프라이빗룸",
+      "콜키지 부과",
+      "채식 메뉴"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

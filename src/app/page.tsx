@@ -239,16 +239,24 @@ function HomeContent() {
     }
   }, [allPlaces, router]);
 
-  // [NEW] 지도 수동 조작 핸들러 (단순히 상세 보기만 닫음, 시점 복구 X)
+  // [NEW] 지도 수동 조작 핸들러 (상세 보기 닫기 및 검색 필터 초기화)
   const handleManualMapInteraction = useCallback(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
-    // 상세 보기가 켜져있을 때만 닫기
+
+    // 1) 상세 보기가 켜져있을 때만 닫기
     if (placeIdParam) {
       router.replace('/', { scroll: false });
     }
-  }, [router, placeIdParam]);
+
+    // 2) [BUG FIX] 사용자가 지도를 직접 움직이면 검색 필터를 해제하여 
+    //    이동한 지역의 핀들이 리스트에 모두 보이도록 함
+    if (currentSearch || searchKeyword) {
+      setCurrentSearch('');
+      setSearchKeyword('');
+    }
+  }, [router, placeIdParam, currentSearch, searchKeyword]);
 
   const handleBackToList = useCallback(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
@@ -277,10 +285,36 @@ function HomeContent() {
   };
 
   const handleMyLocation = useCallback(() => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      alert("이 브라우저에서는 위치 정보를 지원하지 않습니다.");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
-      (pos) => setMyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-      (err) => console.error('geolocation error', err)
+      (pos) => {
+        setMyLocation({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        });
+      },
+      (err) => {
+        // [DEBUG] 에러 객체 상세 출력 (코드와 메시지를 문자열로 합쳐서 출력)
+        console.error(`Geolocation Error Detail: Code(${err.code}), Message(${err.message})`);
+
+        if (err.code === 1) {
+          alert("위치 권한이 거부되었습니다. 브라우저 설정(자물쇠 아이콘 등)에서 위치 권한을 '허용'으로 변경해 주세요.");
+        } else if (err.code === 2) {
+          alert("현재 위치를 가져올 수 없습니다. GPS 신호가 약하거나 위치 서비스를 사용할 수 없는 환경입니다.");
+        } else if (err.code === 3) {
+          alert("위치 정보를 가져오는 시간이 초과되었습니다. 다시 시도해 주세요.");
+        } else {
+          alert(`위치 정보를 가져오는데 실패했습니다. (Error: ${err.message || 'Unknown'})`);
+        }
+      },
+      {
+        enableHighAccuracy: false, // [MOD] 호환성 우선
+        timeout: 15000,
+        maximumAge: 0
+      }
     );
   }, []);
 
