@@ -58,7 +58,9 @@ export default function MobileShell({
 
   // 부모의 searchTrigger와 동기화
   useEffect(() => {
-    setSearchTrigger(parentSearchTrigger);
+    if (parentSearchTrigger !== undefined) {
+      setSearchTrigger(parentSearchTrigger);
+    }
   }, [parentSearchTrigger]);
 
 
