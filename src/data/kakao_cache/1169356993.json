@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "고반식당 이수역점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 동작구 동작대로27가길 15 1층",
+        "geocodeAddress": "[object Object]"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.4868571056,
+      "lon": 126.98121232104
+    },
+    "phonenum": "02-6951-3662",
+    "menu_items": [
+      "숙성돼지고기",
+      "숙성생삼겹",
+      "맛있는 노석들"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

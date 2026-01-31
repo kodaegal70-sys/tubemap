@@ -3,7 +3,7 @@
 import styles from './RightPanel.module.css';
 import { Place } from '@/data/places';
 import FilterPanel from './FilterPanel';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import AdSlot from './AdSlot';
 
 type Props = {
@@ -38,6 +38,17 @@ export default function RightPanel({
   useEffect(() => {
     setCurrentPage(1);
   }, [places.length, activeTab]);
+
+  // 스크롤 컨테이너 참조
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 상세 카드가 활성화되면 스크롤을 맨 위로 이동
+  useEffect(() => {
+    if (focusedPlace && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [focusedPlace]);
+
 
   const handleTabChange = (newTab: 'list' | 'discovery') => {
     if (onTabChange) {
@@ -99,7 +110,7 @@ export default function RightPanel({
             return (
               <>
                 <div className={styles.scrollArea}>
-                  {/* 상세 카드 전용 이전 버튼 */}
+                  {/* 상세 카드 전용 이전 버튼 (고정 위치로 복구) */}
                   {focusedPlace && onClearFocus && (
                     <div className={styles.backToListArea}>
                       <button className={styles.backToListButton} onClick={onClearFocus}>
@@ -107,93 +118,91 @@ export default function RightPanel({
                       </button>
                     </div>
                   )}
+                  <div className={styles.listScroll} ref={scrollRef}>
+                    {/* 상세 카드 (리스트 상단에 위치하여 함께 스크롤되게 변경) */}
+                    {focusedPlace && (() => {
+                      const channelTitle = focusedPlace.channel_title;
+                      const title = focusedPlace.name;
+                      const address = focusedPlace.road_address || focusedPlace.address;
+                      const phone = focusedPlace.phone;
+                      const comment = focusedPlace.best_comment;
+                      const videoThumbnailUrl = focusedPlace.video_thumbnail_url;
 
-                  {/* 상세 카드 (핀/리스트 선택 시) */}
-                  {focusedPlace && (() => {
-                    const channelTitle = focusedPlace.channel_title;
-                    const title = focusedPlace.name;
-                    const address = focusedPlace.road_address || focusedPlace.address;
-                    const phone = focusedPlace.phone;
-                    const comment = focusedPlace.best_comment;
-                    const videoThumbnailUrl = focusedPlace.video_thumbnail_url;
+                      const firstChannel = channelTitle.split(',')[0]?.trim() || '';
+                      const youtubeQuery = `${title} ${firstChannel}`.trim();
+                      const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
 
-                    const firstChannel = channelTitle.split(',')[0]?.trim() || '';
-                    const youtubeQuery = `${title} ${firstChannel}`.trim();
-                    const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
+                      const addressParts = focusedPlace.address ? focusedPlace.address.split(' ') : [];
+                      const regionParts = addressParts.slice(0, 3).filter(part => !part.endsWith('도'));
+                      const region = regionParts.slice(0, 2).join(' ');
+                      const naverSearchQuery = `${title} ${region}`.trim();
+                      const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
 
-                    // 네이버 검색: 업체명 + 지역(주소 앞 2단어 중 '도' 제외)
-                    const addressParts = focusedPlace.address ? focusedPlace.address.split(' ') : [];
-                    const regionParts = addressParts.slice(0, 3).filter(part => !part.endsWith('도'));
-                    const region = regionParts.slice(0, 2).join(' ');
-                    const naverSearchQuery = `${title} ${region}`.trim();
-                    const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
+                      return (
+                        <div className={styles.detailCard}>
 
-                    return (
-                      <div className={styles.detailCard}>
-                        <div className={styles.detailTitle}>{title}</div>
+                          <div className={styles.detailTitle}>{title}</div>
 
-                        {address && (
-                          <div className={styles.detailRow}>
-                            <span>📍</span>
-                            <span>{address}</span>
+                          {address && (
+                            <div className={styles.detailRow}>
+                              <span>📍</span>
+                              <span>{address}</span>
+                            </div>
+                          )}
+
+                          {phone && phone.trim().length > 0 && (
+                            <div className={styles.detailRow}>
+                              <span>📞</span>
+                              <span>{phone}</span>
+                            </div>
+                          )}
+
+                          <div className={styles.detailChannels}>
+                            📺 {channelTitle}
                           </div>
-                        )}
 
-                        {phone && phone.trim().length > 0 && (
-                          <div className={styles.detailRow}>
-                            <span>📞</span>
-                            <span>{phone}</span>
+                          {focusedPlace.menu_primary && (
+                            <div className={styles.detailMenus}>
+                              🍽️ {focusedPlace.menu_primary}
+                            </div>
+                          )}
+
+                          {videoThumbnailUrl ? (
+                            <div className={styles.detailImage}>
+                              <img src={videoThumbnailUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            </div>
+                          ) : (
+                            <div className={styles.detailImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '12px' }}>
+                              이미지 준비중
+                            </div>
+                          )}
+
+                          {comment && (
+                            <div className={styles.detailComment}>“{comment}”</div>
+                          )}
+
+                          <div className={styles.detailActions}>
+                            <a
+                              href={youtubeUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className={`${styles.detailButton} ${styles.youtubeButton}`}
+                            >
+                              영상 보기
+                            </a>
+                            <a
+                              href={naverUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className={`${styles.detailButton} ${styles.naverButton}`}
+                            >
+                              네이버 검색
+                            </a>
                           </div>
-                        )}
-
-                        <div className={styles.detailChannels}>
-                          📺 {channelTitle}
                         </div>
+                      );
+                    })()}
 
-                        {focusedPlace.menu_primary && (
-                          <div className={styles.detailMenus}>
-                            🍽️ {focusedPlace.menu_primary}
-                          </div>
-                        )}
-
-                        {videoThumbnailUrl ? (
-                          <div className={styles.detailImage}>
-                            <img src={videoThumbnailUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          </div>
-                        ) : (
-                          <div className={styles.detailImage} style={{ background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', fontSize: '12px' }}>
-                            이미지 준비중
-                          </div>
-                        )}
-
-                        {comment && (
-                          <div className={styles.detailComment}>“{comment}”</div>
-                        )}
-
-                        <div className={styles.detailActions}>
-                          <a
-                            href={youtubeUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={`${styles.detailButton} ${styles.youtubeButton}`}
-                          >
-                            영상 보기
-                          </a>
-                          <a
-                            href={naverUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className={`${styles.detailButton} ${styles.naverButton}`}
-                          >
-                            네이버 검색
-                          </a>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* 리스트 */}
-                  <div className={styles.listScroll}>
                     {places.length === 0 ? (
                       <div className={styles.empty}>
                         지도 화면 내에 표시할 맛집이 없습니다.

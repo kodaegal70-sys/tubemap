@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "성수동간판없는집",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 성동구 성수일로 59-1 1층",
+        "geocodeAddress": "서울 성동구 성수일로 59-1 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.54590338799391,
+      "lon": 127.05001624500181
+    },
+    "phonenum": "010-559-2634",
+    "menu_items": [
+      "숙주 산과 매콤 국물의 환상 조화",
+      "숙주국물닭발 단품 추천",
+      "콜키지 부과"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

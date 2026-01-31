@@ -51,6 +51,7 @@ async function runSemiAutoIngestion() {
 
     try {
         await browserScraper.init();
+        const processedIds = new Set<string>();
 
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -61,6 +62,12 @@ async function runSemiAutoIngestion() {
             const [youtubeUrl, kakaoUrl] = parts;
             const kakaoId = kakaoScraper.extractPlaceId(kakaoUrl);
             if (!kakaoId) continue;
+
+            if (processedIds.has(kakaoId)) {
+                console.log(`\n[${i + 1}/${lines.length}] ⏭️ 중복 ID 스킵: ${kakaoId}`);
+                continue;
+            }
+            processedIds.add(kakaoId);
 
             console.log(`\n[${i + 1}/${lines.length}] 수집 준비: ${kakaoUrl}`);
 
@@ -100,9 +107,12 @@ async function runSemiAutoIngestion() {
                 const officialData = await kakaoScraper.getPlaceDetails(kakaoId);
 
                 console.log(`[Ingester] 📡 Fetching coordinates ONLY via Kakao REST API...`);
-                // 검색 힌트로 가게명과 주소를 함께 사용
-                const searchName = rawVision?.basicInfo.placenamefull || officialData?.name;
+
+                // [FIX] 좌표 검색 시에는 AI 이름(오타 가능성)보다 카카오 공식 이름 우선 사용
+                // (사용자가 제공한 ID 기반으로 찾은 공식 이름이므로 정확도 100%)
+                const searchName = officialData?.name || rawVision?.basicInfo.placenamefull;
                 const searchAddr = officialData?.address || rawVision?.basicInfo.address.addressname.fullAddress;
+
                 const restData = await kakaoScraper.fetchFromREST(kakaoId, { name: searchName, address: searchAddr });
 
                 if (restData && restData.lat !== 0) {
@@ -121,17 +131,34 @@ async function runSemiAutoIngestion() {
                 }
 
                 // 3. 하이브리드 병합 (무결성 강화)
+                const phoneCleaner = (val: any) => {
+                    const s = String(val || "").trim();
+                    if (!/^0\d{1,3}-?\d{3,4}-?\d{4}$/.test(s)) return "";
+                    return s;
+                }
+
+                const rawPhone = rawVision?.basicInfo.phonenum;
+                const officialPhone = officialData?.phone;
+                // AI Phone Valid? -> Use AI. Else -> Check Official. Else -> ""
+                const finalPhone = phoneCleaner(rawPhone) || phoneCleaner(officialPhone) || "";
+
                 const mergedKakao = {
                     basicInfo: {
                         placenamefull: rawVision?.basicInfo.placenamefull || officialData?.name || "Unknown Store",
                         address: rawVision?.basicInfo.address || { addressname: { fullAddress: officialData?.address || "" } },
-                        category: { fullname: officialData?.category || "" },
+                        // [FIX] AI 분석 결과(rawVision)가 있으면 우선 사용
+                        category: rawVision?.basicInfo.category || { fullname: officialData?.category || "" },
                         wgs84: finalCoords,
-                        phonenum: rawVision?.basicInfo.phonenum || officialData?.phone || "",
+                        phonenum: finalPhone,
                         menu_items: rawVision?.basicInfo.menu_items || []
                     },
                     photo: rawVision?.photo || { selectedPhoto: { orgurl: officialData?.menu_image_url || "" } }
                 };
+
+                // [DEBUG] 수집된 데이터 카테고리 확인
+                if (mergedKakao.basicInfo.category) {
+                    console.log(`[Ingester] 🤖 Merged Category:`, JSON.stringify(mergedKakao.basicInfo.category));
+                }
 
                 const cacheDir = path.join(process.cwd(), 'src', 'data', 'kakao_cache');
                 if (!fs.existsSync(cacheDir)) fs.mkdirSync(cacheDir, { recursive: true });

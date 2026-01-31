@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "서령 본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 중구 소월로 10 단암타워 1층",
+        "geocodeAddress": "서울 중구 소월로 10 단암타워 1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.55846234223722,
+      "lon": 126.97549698076399
+    },
+    "phonenum": "",
+    "menu_items": [
+      "맑고 깊은 육수의 정갈한 평양냉면",
+      "서령 순면 추천",
+      "생활의 달인 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

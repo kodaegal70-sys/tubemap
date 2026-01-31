@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "윤봉산장",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 동작구 장승배기로 118-1 1층",
+        "geocodeAddress": "서울 동작구 장승배기로 118-1"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.50807841423189,
+      "lon": 126.9402596282471
+    },
+    "phonenum": "02-815-2850",
+    "menu_items": [
+      "양고기 전골",
+      "수육",
+      "양고기 구이"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

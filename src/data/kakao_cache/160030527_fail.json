@@ -1,0 +1,28 @@
+{
+  "status": "partial_success",
+  "reason": "Vision failed, but Official data found",
+  "mergedKakao": {
+    "basicInfo": {
+      "placenamefull": "이리데센트",
+      "address": {
+        "addressname": {
+          "fullAddress": "서울 성동구 서울숲4길 20-1 1층"
+        }
+      },
+      "category": {
+        "fullname": ""
+      },
+      "wgs84": {
+        "lat": 37.5471539767399,
+        "lon": 127.043159535497
+      },
+      "phonenum": "02-468-9438",
+      "menu_items": []
+    },
+    "photo": {
+      "selectedPhoto": {
+        "orgurl": ""
+      }
+    }
+  }
+}

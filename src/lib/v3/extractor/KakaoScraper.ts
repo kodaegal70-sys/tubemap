@@ -161,6 +161,13 @@ export class KakaoScraper {
      */
     public parseKakaoData(placeId: string, data: any): KakaoDetailedInfo {
         const basic = data.basicInfo;
+        // [DEBUG] AI 데이터 유입 확인
+        if (basic.category) {
+            console.log(`[KakaoScraper] DEBUG: basic.category =`, basic.category);
+        } else {
+            console.log(`[KakaoScraper] DEBUG: basic.category IS MISSING`, basic);
+        }
+
         const menuInfo = data.menuInfo;
         const photo = data.photo;
 

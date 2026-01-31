@@ -1,0 +1,28 @@
+{
+  "status": "partial_success",
+  "reason": "Vision failed, but Official data found",
+  "mergedKakao": {
+    "basicInfo": {
+      "placenamefull": "울프강스테이크하우스 청담점",
+      "address": {
+        "addressname": {
+          "fullAddress": "서울 강남구 선릉로152길 21 영인빌딩 1층"
+        }
+      },
+      "category": {
+        "fullname": ""
+      },
+      "wgs84": {
+        "lat": 37.52439983131448,
+        "lon": 127.04141558950498
+      },
+      "phonenum": "02-556-8700",
+      "menu_items": []
+    },
+    "photo": {
+      "selectedPhoto": {
+        "orgurl": ""
+      }
+    }
+  }
+}

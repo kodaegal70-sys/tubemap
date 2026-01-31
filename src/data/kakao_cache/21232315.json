@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "남포면옥",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 중구 을지로3길 24 1-2층",
+        "geocodeAddress": "[object Object]"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.5671652991647,
+      "lon": 126.981753597164
+    },
+    "phonenum": "02-777-3131",
+    "menu_items": [
+      "동치미 국물의 산뜻한 평양냉면",
+      "한우어복쟁반 (대) 추천",
+      "프라이빗룸"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

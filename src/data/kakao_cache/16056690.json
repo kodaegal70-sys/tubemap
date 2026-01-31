@@ -3,21 +3,21 @@
     "placenamefull": "갯마을고향의맛",
     "address": {
       "addressname": {
-        "fullAddress": "서울 노원구 상계로 96 1층 봉사",
-        "geocodeAddress": "서울 노원구 상계로 96"
+        "fullAddress": "서울 노원구 상계로 96 1층",
+        "geocodeAddress": "서울 노원구 상계로 96 1층"
       }
     },
     "category": {
-      "fullname": ""
+      "fullname": "한식"
     },
     "wgs84": {
       "lat": 37.656670774446475,
       "lon": 127.06553123204154
     },
-    "phonenum": "",
+    "phonenum": "(01695) 01695",
     "menu_items": [
-      "피굴",
-      "매생이국밥"
+      "바다 향 가득한 전통 피굴의 깊은 맛",
+      "매생이국밥 추천"
     ]
   },
   "photo": {

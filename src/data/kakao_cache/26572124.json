@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "울프강스테이크하우스 청담점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 강남구 선릉로152길 21 영인빌딩 1층",
+        "geocodeAddress": "[object Object]"
+      }
+    },
+    "category": {
+      "fullname": "양식"
+    },
+    "wgs84": {
+      "lat": 37.52439983131448,
+      "lon": 127.04141558950498
+    },
+    "phonenum": "02-556-8700",
+    "menu_items": [
+      "포티하우스 스테이크 (100g) 추천",
+      "프라이빗룸",
+      "콜키지 부과"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

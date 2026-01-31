@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "만배아리랑보쌈 본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 강서구 화곡로 131",
+        "geocodeAddress": "서울 강서구 화곡로 131"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.54088279877212,
+      "lon": 126.83625535786678
+    },
+    "phonenum": "02-2607-3126",
+    "menu_items": [
+      "특수부위 보쌈과 해물칼국수의 조화",
+      "반반보쌈 (소) 추천",
+      "히밥heebab 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

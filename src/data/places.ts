@@ -87,36 +87,4 @@ export interface Place {
     updated_at?: string;
 }
 
-export const DUMMY_PLACES: Place[] = [
-    {
-        "id": "dummy-1",
-        "name": "화목순대국",
-        "lat": 37.519082,
-        "lng": 126.930416,
-        "channel_title": "성시경 SUNG SI KYUNG",
-        "video_url": "https://www.youtube.com/watch?v=videoId1",
-        "best_comment": "성시경님이 왜 인생 순대국라고 했는지 알겠네요. 꼬릿한 내장 고기 풍미가 예술입니다.",
-        "address": "서울 영등포구 여의대방로 383",
-        "road_address": "서울 영등포구 여의대방로 383",
-        "phone": "02-780-8191",
-        "category": "음식점 > 한식 > 국밥 > 순대국",
-        "menu_primary": "순대국, 내장탕, 머고기",
-        "image_url": "https://placehold.co/400x400/png?text=Menu+Photo",
-        "video_thumbnail_url": "https://placehold.co/1280x720/png?text=Youtube+Thumbnail"
-    },
-    {
-        "id": "dummy-2",
-        "name": "함경도찹쌀순대",
-        "lat": 37.493774,
-        "lng": 127.121803,
-        "channel_title": "성시경 SUNG SI KYUNG",
-        "video_url": "https://www.youtube.com/watch?v=videoId2",
-        "best_comment": "가락동의 전설... 수육이 정말 야들야들하고 순대국 국물이 잡내 하나 없이 진국입니다.",
-        "address": "서울 송파구 송파대로28길 32",
-        "phone": "02-403-8822",
-        "category": "음식점 > 한식 > 국밥 > 순대국",
-        "menu_primary": "수육, 순대국, 정식",
-        "image_url": "https://placehold.co/400x400/png?text=Menu+Photo+2",
-        "video_thumbnail_url": "https://placehold.co/1280x720/png?text=Youtube+Thumbnail+2"
-    }
-];
+export const DUMMY_PLACES: Place[] = [];

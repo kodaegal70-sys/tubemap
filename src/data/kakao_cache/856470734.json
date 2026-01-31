@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "백년교동짬뽕 수색본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "경기 고양시 덕양구 중앙로 245 1층",
+        "geocodeAddress": "경기 고양시 덕양구 중앙로 245 1층"
+      }
+    },
+    "category": {
+      "fullname": "중식"
+    },
+    "wgs84": {
+      "lat": 37.607423759006714,
+      "lon": 126.86379857082954
+    },
+    "phonenum": "02-3158-5753",
+    "menu_items": [
+      "불향 가득한 해물 가득 짬뽕의 진수",
+      "불맛쭈꾸미덮밥 추천",
+      "단체석"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

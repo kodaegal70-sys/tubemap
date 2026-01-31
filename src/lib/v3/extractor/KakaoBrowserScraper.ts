@@ -1,19 +1,20 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+
 import * as puppeteer from 'puppeteer';
 import { Browser, Page } from 'puppeteer';
 import * as path from 'path';
 import * as fs from 'fs';
 import sharp from 'sharp';
 
+// Node 18+ includes fetch natively. If older, one might need 'undici' or 'node-fetch'.
+// import { fetch } from "undici"; 
+
 export class KakaoBrowserScraper {
     private browser: Browser | null = null;
     private page: Page | null = null;
-    private genAI: GoogleGenerativeAI;
 
     constructor() {
-        const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || process.env.YOUTUBE_API_KEY;
-        if (!apiKey) throw new Error("GOOGLE_API_KEY is missing via NEXT_PUBLIC_GOOGLE_API_KEY or YOUTUBE_API_KEY");
-        this.genAI = new GoogleGenerativeAI(apiKey);
+        // LM Studio local server (OpenAI-compatible)
+        // no api key needed by default for local server
     }
 
     async init() {
@@ -73,6 +74,91 @@ export class KakaoBrowserScraper {
         }
     }
 
+    private async callLmStudioVision(imageBase64: string): Promise<any> {
+        const endpoint = "http://127.0.0.1:1234/v1/chat/completions";
+        const model = "qwen2.5-vl-7b-instruct";
+
+        // 토큰 최소화 프롬프트 (JSON ONLY 강제) + 카테고리 정의 상세화
+        const prompt =
+            `Extract store info from Kakao Map place page screenshot.
+      Return ONLY JSON with keys:
+      name, category, address_raw, address_geocode, phone, menus(3).
+      
+      Category Definitions (Strictly Choose One):
+      - 한식: Korean food, Kimchi, Stew, Bibimbap, Pork Belly (Samgyeopsal)
+      - 중식: Chinese food, Jajangmyeon, Jjamppong, Tangsuyuk, Mala
+      - 일식: Japanese food, Sushi, Sashimi, Tonkatsu, Ramen, Udon, Omakase, Tuna, Raw Fish
+      - 양식: Western food, Steak, Pasta, Pizza, Burger, Salad
+      - 분식: Korean Snack, Tteokbokki, Gimbap, Ramyeon, Sundae
+      - 기타: Cafe, Coffee, Bakery, Dessert, Bar, Pub, Alcohol only
+      
+      Phone Number Guidelines:
+      - Valid formats: 02-xxxx-xxxx, 010-xxxx-xxxx, 031-xxx-xxxx
+      - Safe numbers (4-digit prefix): 0507-xxxx-xxxx, 0503-xxxx-xxxx, 050x-xxxx-xxxx are VALID.
+      - Do NOT extract Zip codes (e.g., (04527)) or distances (e.g., 167m) as phone numbers.
+
+      menus: try for exactly 3 distinct items (if fewer exist, return fewer).`;
+
+        const body = {
+            model,
+            temperature: 0,
+            max_tokens: 300,
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        { type: "text", text: prompt },
+                        {
+                            type: "image_url",
+                            image_url: { url: `data:image/png;base64,${imageBase64}` }
+                        }
+                    ]
+                }
+            ]
+        };
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 60000);
+
+        try {
+            const res = await fetch(endpoint, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+                signal: controller.signal
+            });
+
+            if (!res.ok) {
+                const t = await res.text().catch(() => "");
+                throw new Error(`LM Studio HTTP ${res.status}: ${t}`);
+            }
+
+            const json = await res.json();
+
+            const content: string =
+                json?.choices?.[0]?.message?.content ??
+                "";
+
+            // code fence 제거 + JSON만 최대한 추출
+            const cleaned = content
+                .replace(/```json/gi, "")
+                .replace(/```/g, "")
+                .trim();
+
+            // 혹시 앞뒤로 텍스트 섞이면 JSON 블록만 잡기
+            const firstBrace = cleaned.indexOf("{");
+            const lastBrace = cleaned.lastIndexOf("}");
+            const jsonOnly =
+                firstBrace >= 0 && lastBrace > firstBrace
+                    ? cleaned.slice(firstBrace, lastBrace + 1)
+                    : cleaned;
+
+            return JSON.parse(jsonOnly);
+        } finally {
+            clearTimeout(timeout);
+        }
+    }
+
     async getPlaceDetails(placeId: string): Promise<any | null> {
         if (!this.browser || !this.page) await this.init();
 
@@ -102,7 +188,7 @@ export class KakaoBrowserScraper {
             console.log(`[KakaoBrowserScraper] ⏳ 사용자 클릭 대기 중...`);
             await this.page!.waitForFunction(() => (window as any).SCRAP_READY === true, { timeout: 0 });
 
-            console.log(`[Gemini Vision] 📸 화면 캡처 및 AI 분석 시작...`);
+            console.log(`[LM Studio Vision] 📸 화면 캡처 및 AI 분석 시작...`);
 
             // 1. [스크린샷] AI 분석(OCR/Text)을 위한 화면 캡처 (저장 안함)
             let infoBase64 = "";
@@ -114,9 +200,10 @@ export class KakaoBrowserScraper {
                 const metadata = await image.metadata();
 
                 if (metadata.width && metadata.height) {
-                    // AI 인식률을 위해 중앙 50% 영역만 크롭 (분석 정확도 향상용)
-                    const extractWidth = Math.floor(metadata.width * 0.5);
-                    const left = Math.floor(metadata.width * 0.25);
+                    // AI 인식률을 위해 중앙 35% 영역만 크롭 (분석 정확도 향상용)
+                    // [MOD] 2024-01-31: 사용자 요청으로 50% -> 35%로 축소
+                    const extractWidth = Math.floor(metadata.width * 0.35);
+                    const left = Math.floor(metadata.width * 0.325); // (1 - 0.35) / 2 = 0.325
 
                     const sideCroppedBuf = await image
                         .extract({ left, top: 0, width: extractWidth, height: metadata.height })
@@ -130,39 +217,14 @@ export class KakaoBrowserScraper {
                 return null;
             }
 
-            // 2. [AI 분석] 메뉴 및 업체명 추출
-            const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-            const prompt = `
-                Analyze the provided image from a Kakao Map place detail page.
-                Extract store name, address, phone, and menus.
-                
-                **IMPORTANT**: You MUST try hard to extract exactly 3 distinct menu items.
-                Look closely at the menu list or food descriptions. 
-                Do not stop at 1 or 2 items unless the image absolutely lists fewer than 3 items total.
-                
-                Return STRICTLY as a JSON object:
-                {
-                    "name": "Store Name",
-                    "address_raw": "Full Address",
-                    "address_geocode": "Cleaned address for geocoding",
-                    "phone": "Phone Number",
-                    "menus": ["Item 1", "Item 2", "Item 3"]
-                }
-            `;
-
-            const result = await model.generateContent([
-                { text: prompt },
-                { inlineData: { data: infoBase64, mimeType: "image/png" } }
-            ]);
-            const responseText = await result.response.text();
-            const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
-            let aiData;
+            // 2. [AI 분석] 메뉴 및 업체명 추출 (Local LM Studio)
+            let aiData: any = {};
             try {
-                aiData = JSON.parse(cleanJson);
-                console.log(`[KakaoBrowserScraper] 🤖 AI Analysis Result:`, aiData.name, aiData.menus);
-            } catch (e) {
-                console.error("AI Parse Error:", e);
-                aiData = {};
+                aiData = await this.callLmStudioVision(infoBase64);
+                console.log(`[LM Studio Vision] 🤖`, aiData?.name, aiData?.category, aiData?.menus);
+            } catch (e: any) {
+                console.error("[LM Studio Vision] Error:", e?.message || e);
+                aiData = {}; // fallback
             }
 
             // 3. [Step 3: Vantage Image]
@@ -170,8 +232,10 @@ export class KakaoBrowserScraper {
             // NO_OP
 
             // 4. [데이터 반환]
-            const addressCleaner = (s: string) => {
-                if (!s) return "";
+            const addressCleaner = (val: any) => {
+                const s = String(val || "");
+                if (!s || s === "undefined" || s === "null") return "";
+
                 let clean = s.replace(/\(\우\)\d{5}/g, '').replace(/복사/g, '').replace(/지번|우편번호/g, '').replace(/\s+/g, ' ').trim();
                 // [NEW] 층수(1층, 지하 1층, B1층 등) 이후 텍스트 제거 로직
                 const floorMatch = clean.match(/(지하\s*\d+층|\d+층|B\d+층)/);
@@ -180,12 +244,37 @@ export class KakaoBrowserScraper {
                 }
                 return clean;
             };
+
+            const phoneCleaner = (val: any) => {
+                const s = String(val || "").trim();
+                // 1. 0으로 시작하고, 숫자와 하이픈만 있어야 하며, 길이가 최소 9자 이상
+                // 2. 050 안심번호(4자리 국번) 포함
+                // 정규식: ^0\d{1,3}-?\d{3,4}-?\d{4}$
+                // 예: 02-123-4567, 010-1234-5678, 0507-1234-5678
+                if (!/^0\d{1,3}-?\d{3,4}-?\d{4}$/.test(s)) {
+                    // 전화번호 형식이 아니면(우편번호, 일반 텍스트 등) 빈 문자열 반환
+                    return "";
+                }
+                return s;
+            }
+
             const cleanAddress = addressCleaner(aiData.address_raw);
-            const cleanGeocode = addressCleaner(aiData.address_geocode);
+            const cleanGeocode = addressCleaner(aiData.address_geocode || aiData.address_raw);
+            const cleanPhone = phoneCleaner(aiData.phone);
 
             // 이미지 실패 시 기본 빈 값이나 placeholder 고려 가능 (현재는 그냥 파일 생성 안됨)
             // 만약 파일이 없으면 프론트엔드에서 처리가 필요할 수 있음.
             // 여기서는 성공 여부와 상관없이 Path 반환 (파일 존재 여부는 나중 문제)
+
+            const validCategories = ['한식', '중식', '일식', '양식', '분식'];
+            let category = (aiData.category || "기타").trim();
+            if (!validCategories.includes(category) && category !== '기타') {
+                console.log(`[Category Fix] AI returned '${category}', mapping to '기타'`);
+                category = '기타';
+            }
+
+            const finalCategory = { fullname: category };
+            console.log(`[KakaoBrowserScraper] DEBUG: Returning category object:`, finalCategory);
 
             return {
                 basicInfo: {
@@ -196,10 +285,10 @@ export class KakaoBrowserScraper {
                             geocodeAddress: cleanGeocode
                         }
                     },
-                    category: { fullname: "" },
+                    category: finalCategory,
                     wgs84: { lat: 0, lon: 0 },
                     menu_items: aiData.menus || [],
-                    phonenum: aiData.phone || ""
+                    phonenum: cleanPhone
                 },
                 photo: {
                     selectedPhoto: {
@@ -210,9 +299,6 @@ export class KakaoBrowserScraper {
 
         } catch (error: any) {
             console.error(`🚨 Fatal Error:`, error);
-            if (error.message?.includes("403") || error.message?.includes("PERMISSION_DENIED")) {
-                console.error("⚠️ [Tip] 해당 API Key에 'Generative Language API' 권한이 없거나, AI Studio Key가 아닙니다.");
-            }
             return null;
         }
     }

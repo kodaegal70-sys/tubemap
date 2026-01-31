@@ -1,3 +1,5 @@
-2026/01/31-05:12:03.161 c1f4 Reusing MANIFEST C:\Users\cloud\media store map\.puppeteer_data\Default\Local Storage\leveldb/MANIFEST-000001
-2026/01/31-05:12:03.168 c1f4 Recovering log #3
-2026/01/31-05:12:03.171 c1f4 Reusing old log C:\Users\cloud\media store map\.puppeteer_data\Default\Local Storage\leveldb/000003.log 
+2026/01/31-20:56:51.760 1010c Reusing MANIFEST C:\Users\cloud\media store map\.puppeteer_data\Default\Local Storage\leveldb/MANIFEST-000001
+2026/01/31-20:56:51.764 1010c Recovering log #3
+2026/01/31-20:56:51.765 1010c Level-0 table #3: started
+2026/01/31-20:56:51.769 1010c Level-0 table #3: 8102 bytes OK
+2026/01/31-20:56:51.773 1010c Delete type=0 #3

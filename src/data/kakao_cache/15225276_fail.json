@@ -1,0 +1,28 @@
+{
+  "status": "partial_success",
+  "reason": "Vision failed, but Official data found",
+  "mergedKakao": {
+    "basicInfo": {
+      "placenamefull": "성수동간판없는집",
+      "address": {
+        "addressname": {
+          "fullAddress": "서울 성동구 성수일로 59-1 1층"
+        }
+      },
+      "category": {
+        "fullname": ""
+      },
+      "wgs84": {
+        "lat": 37.54590338799391,
+        "lon": 127.05001624500181
+      },
+      "phonenum": "010-559-2634",
+      "menu_items": []
+    },
+    "photo": {
+      "selectedPhoto": {
+        "orgurl": ""
+      }
+    }
+  }
+}

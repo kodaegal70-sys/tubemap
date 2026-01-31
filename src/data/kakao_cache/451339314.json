@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "코와우동",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 종로구 계동길 17 지하1층",
+        "geocodeAddress": "서울 종로구 계동길 17 지하1층"
+      }
+    },
+    "category": {
+      "fullname": "한식"
+    },
+    "wgs84": {
+      "lat": 37.5781022250591,
+      "lon": 126.986590555186
+    },
+    "phonenum": "",
+    "menu_items": [
+      "쫄깃한 자가제면 우동과 바삭한 튀김의 만남",
+      "카키야게우동 추천",
+      "바테이블"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

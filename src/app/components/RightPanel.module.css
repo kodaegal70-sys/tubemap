@@ -19,7 +19,9 @@
    align-items: center;
    justify-content: space-between;
    margin-bottom: 10px;
-   flex-shrink: 0;
+   width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
  }
 
  .title {
@@ -122,7 +124,10 @@
    cursor: pointer;
    gap: 10px;
    transition: transform 0.15s ease, box-shadow 0.15s ease;
- }
+     width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
 
  .placeCard:hover {
    transform: translateY(-1px);
@@ -145,21 +150,30 @@
    display: flex;
    flex-direction: column;
    justify-content: center;
- }
+     min-width: 0;
+}
 
  .name {
    font-size: 15px;
    font-weight: 700;
    color: #222;
    margin-bottom: 2px;
- }
+    word-break: break-all;
+    overflow-wrap: break-word;
+     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
  .channels {
    font-size: 11px;
    color: #E65100;
    font-weight: 700;
    margin-bottom: 2px;
- }
+     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
  .menus {
    font-size: 11px;
@@ -180,7 +194,10 @@
    -webkit-box-orient: vertical;
    overflow: hidden;
    text-overflow: ellipsis;
- }
+    word-break: break-all;
+    overflow-wrap: break-word;
+     white-space: nowrap;
+}
 
  .empty {
    flex: 1;
@@ -218,7 +235,9 @@
    padding: 14px;
    margin-bottom: 10px;
    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-   flex-shrink: 0;
+   width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
  }
 
  .detailTitle {
@@ -226,7 +245,12 @@
    font-weight: 800;
    margin-bottom: 6px;
    color: #222;
- }
+    word-break: break-all;
+    overflow-wrap: break-word;
+     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
  .detailRow {
    display: flex;
@@ -275,7 +299,8 @@
    -webkit-box-orient: vertical;
    overflow: hidden;
    text-overflow: ellipsis;
- }
+     white-space: nowrap;
+}
 
  .detailActions {
    display: flex;

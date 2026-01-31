@@ -194,9 +194,44 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
                 map,
                 averageCenter: true,
                 minLevel: 5, // 5 레벨 이하로 들어가면 개별 마커로 분해
-                disableClickZoom: false,
+                disableClickZoom: true, // [MOD] 커스텀 클릭 이벤트를 위해 기본 동작 비활성화
+            });
+
+            // [NEW] 클러스터 클릭 이벤트 핸들러 (모바일 오프셋 고려 - Bounds 확장 전략)
+            window.kakao.maps.event.addListener(clustererRef.current, 'clusterclick', (cluster: any) => {
+                const bounds = cluster.getBounds();
+
+                const latestIsMobile = propsRef.current.isMobile;
+                const latestSheetState = propsRef.current.mobileSheetState;
+
+                // [MOBILE UX] 바텀시트가 Half(60% 가림) 상태일 때
+                // 화면의 상단 40%만 유효 영역이므로, Bounds의 하단을 인위적으로 늘려서
+                // 전체 Bounds의 상단 40% 지점에 실제 핀 그룹이 오도록 유도함.
+                if (latestIsMobile && latestSheetState === 'half') {
+                    const sw = bounds.getSouthWest();
+                    const ne = bounds.getNorthEast();
+                    const latDiff = ne.getLat() - sw.getLat();
+
+                    // 유효 높이 40% : 전체 높이 100% = latDiff : totalLatDiff
+                    // totalLatDiff = latDiff * 2.5
+                    // 남쪽으로 추가해야 할 패딩 = totalLatDiff - latDiff = latDiff * 1.5
+                    const padding = latDiff * 1.5;
+
+                    // 원래 Bounds + 남쪽 패딩 확장
+                    const extendedBounds = new window.kakao.maps.LatLngBounds();
+                    extendedBounds.extend(sw);
+                    extendedBounds.extend(ne);
+                    extendedBounds.extend(new window.kakao.maps.LatLng(sw.getLat() - padding, sw.getLng()));
+
+                    map.setBounds(extendedBounds);
+                } else {
+                    // PC이거나 모바일 풀/피크 상태면 정직하게 피팅
+                    map.setBounds(bounds);
+                }
             });
         }
+
+
 
         const clusterer = clustererRef.current;
         const baseMarkerImage = new window.kakao.maps.MarkerImage(BASE_IMAGE_SRC, new window.kakao.maps.Size(32, 32), { offset: new window.kakao.maps.Point(16, 30) });

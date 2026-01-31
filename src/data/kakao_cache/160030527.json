@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "이리데센트",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 성동구 서울숲4길 20-1 1층",
+        "geocodeAddress": "[object Object]"
+      }
+    },
+    "category": {
+      "fullname": "기타"
+    },
+    "wgs84": {
+      "lat": 37.5471539767399,
+      "lon": 127.043159535497
+    },
+    "phonenum": "02-468-9438",
+    "menu_items": [
+      "깻잎 스무디와 두㎛쿠키의 신비한 조합",
+      "시트러스 깻잎스무디 추천",
+      "단체석"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

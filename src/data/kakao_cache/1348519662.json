@@ -4,11 +4,11 @@
     "address": {
       "addressname": {
         "fullAddress": "서울 중구 명동길 25-6 1층",
-        "geocodeAddress": "서울 중구 명동길 25-6"
+        "geocodeAddress": "서울 중구 명동길 25-6 1층"
       }
     },
     "category": {
-      "fullname": ""
+      "fullname": "한식"
     },
     "wgs84": {
       "lat": 37.563986878949244,
@@ -16,9 +16,9 @@
     },
     "phonenum": "02-3789-9389",
     "menu_items": [
-      "복튀김",
-      "복지리",
-      "복찜"
+      "조용한 골목 속 깊은 복어의 맛",
+      "복튀김(소) 추천",
+      "식객 허영만의 백반기행 언급"
     ]
   },
   "photo": {

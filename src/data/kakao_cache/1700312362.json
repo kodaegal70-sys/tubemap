@@ -1,6 +1,6 @@
 {
   "basicInfo": {
-    "placenamefull": "번동피순대 본점",
+    "placenamefull": "번동피순대 본점 순대",
     "address": {
       "addressname": {
         "fullAddress": "서울 도봉구 덕릉로 229 1층",
@@ -8,17 +8,17 @@
       }
     },
     "category": {
-      "fullname": ""
+      "fullname": "한식"
     },
     "wgs84": {
       "lat": 37.6385749804697,
       "lon": 127.037717346903
     },
-    "phonenum": "",
+    "phonenum": "01471",
     "menu_items": [
-      "순대",
-      "피순대",
-      "피순대국밥"
+      "피순대국밥 추천",
+      "성시경 언급",
+      "단체석"
     ]
   },
   "photo": {

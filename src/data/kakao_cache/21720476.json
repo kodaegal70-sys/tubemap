@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "쿠마상회",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 영등포구 여의대방로69길 7 2층",
+        "geocodeAddress": "[object Object]"
+      }
+    },
+    "category": {
+      "fullname": "일식"
+    },
+    "wgs84": {
+      "lat": 37.5197649426955,
+      "lon": 126.931255055582
+    },
+    "phonenum": "02-2645-7222",
+    "menu_items": [
+      "신선한 활어회와 깊은 감칠맛의 향연",
+      "쿠마 특선 오마카세 추천",
+      "맛있는 노석들 (Tasty Guys) 언급"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "basicInfo": {
+    "placenamefull": "OilFriedZip",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 성동구 연무장길 41-18 1층",
+        "geocodeAddress": "서울 성동구 연무장길 41-18 1층"
+      }
+    },
+    "category": {
+      "fullname": "기타"
+    },
+    "wgs84": {
+      "lat": 37.5432526061465,
+      "lon": 127.054195548018
+    },
+    "phonenum": "070-8836-5533",
+    "menu_items": [
+      "들기름 항 가득한 바삭한 감자튀김",
+      "루프탑"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}
