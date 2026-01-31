@@ -112,6 +112,18 @@ export class CuratedCollector {
                 updated_at: new Date().toISOString()
             };
 
+            // 5. [신규] 기존 데이터 로드 및 병합 (DB/파일 저장 전)
+            const existingPlace = this.getExistingPlaceFromOffline(info.id);
+            if (existingPlace) {
+                // channel_title & media_label 병합
+                const existingChannels = (existingPlace.channel_title || "").split(',').map((s: string) => s.trim()).filter(Boolean);
+                const newChannels = (videoInfo.channelTitle || "").split(',').map((s: string) => s.trim()).filter(Boolean);
+                const mergedChannels = Array.from(new Set([...existingChannels, ...newChannels]));
+
+                placeData.channel_title = mergedChannels.join(', ');
+                placeData.media_label = mergedChannels.join(', ');
+            }
+
             // 6. DB 저장 (Supabase Upsert) - 점검 중이거나 실패 경험이 있으면 건너뜀
             if (this.dbEnabled) {
                 try {
@@ -156,6 +168,17 @@ export class CuratedCollector {
             fs.writeFileSync(filePath, JSON.stringify(currentData, null, 2));
         } catch (e) {
             console.error("[CuratedCollector] Offline save failed", e);
+        }
+    }
+
+    private getExistingPlaceFromOffline(kakaoId: string): any | null {
+        try {
+            const filePath = path.join(process.cwd(), 'src', 'data', 'offline_places.json');
+            if (!fs.existsSync(filePath)) return null;
+            const currentData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+            return currentData.find((p: any) => p.kakao_place_id === kakaoId) || null;
+        } catch (e) {
+            return null;
         }
     }
 
