@@ -130,7 +130,7 @@ async function runSemiAutoIngestion() {
                         phonenum: rawVision?.basicInfo.phonenum || officialData?.phone || "",
                         menu_items: rawVision?.basicInfo.menu_items || []
                     },
-                    photo: rawVision?.photo || { selectedPhoto: { orgurl: officialData?.imageUrl || "" } }
+                    photo: rawVision?.photo || { selectedPhoto: { orgurl: officialData?.menu_image_url || "" } }
                 };
 
                 const cacheDir = path.join(process.cwd(), 'src', 'data', 'kakao_cache');
