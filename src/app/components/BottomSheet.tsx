@@ -5,7 +5,6 @@ import { useMobile } from '../contexts/MobileContext';
 import styles from './BottomSheet.module.css';
 import { Place } from '@/data/places';
 import DiscoveryPanel from './DiscoveryPanel';
-import AdSenseBanner from './AdSenseBanner';
 
 interface Props {
   places: Place[];
@@ -51,6 +50,7 @@ export default function BottomSheet({
   const startY = useRef(0);
   const currentY = useRef(0);
   const isDragging = useRef(false);
+  const listScrollRef = useRef<HTMLDivElement>(null);
 
   // 스크롤 락: half/full일 때 body scroll lock
   useEffect(() => {
@@ -101,6 +101,13 @@ export default function BottomSheet({
       setSheetState('half');
     }
   }, [focusedPlaceId]); // focusedPlace 객체 대신 ID만 감시하여 불필요한 재실행 방지
+
+  // 상세 카드가 활성화되면 리스트 스크롤을 맨 위로 이동
+  useEffect(() => {
+    if (focusedPlace && listScrollRef.current) {
+      listScrollRef.current.scrollTop = 0;
+    }
+  }, [focusedPlaceId]);
 
   // 탭 제목 및 리스트 카운트
   const tabTitle = sheetTab === 'list' ? '리스트' : '디스커버리';
@@ -181,7 +188,7 @@ export default function BottomSheet({
       <div className={styles.content}>
         {/* 탭 A: 리스트 */}
         {sheetTab === 'list' && (
-          <div className={styles.panelContent}>
+          <div className={styles.panelContent} ref={listScrollRef}>
             {places.length === 0 ? (
               <div className={styles.emptyState}>
                 화면 내에 맛집이 없습니다.
@@ -191,7 +198,10 @@ export default function BottomSheet({
                 {(() => {
                   const totalPages = Math.ceil(places.length / ITEMS_PER_PAGE);
                   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-                  const paginatedPlaces = places.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+                  // 선택된 장소는 필터링하여 따로 렌더링하고 나머지만 슬라이싱
+                  const otherPlaces = places.filter(p => p.id !== focusedPlace?.id);
+                  const paginatedPlaces = otherPlaces.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
                   return (
                     <>
@@ -204,104 +214,101 @@ export default function BottomSheet({
                         </div>
                       )}
 
-                      {paginatedPlaces.map(place => {
-                        const isActive = focusedPlace && focusedPlace.id === place.id;
+                      {/* [SELECTED] 상세 카드 (최상단 고정) */}
+                      {focusedPlace && (() => {
+                        const place = focusedPlace;
                         const channelTitle = place.channel_title;
                         const title = place.name;
                         const comment = place.best_comment;
-                        const menuImageUrl = place.image_url;
                         const videoThumbnailUrl = place.video_thumbnail_url;
 
-                        if (isActive) {
-                          // 유튜브 검색: 업체명 + 첫 번째 채널명
-                          const firstChannel = channelTitle.split(',')[0]?.trim() || '';
-                          const youtubeQuery = `${place.name} ${firstChannel}`.trim();
-                          const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
+                        // 유튜브 검색
+                        const firstChannel = channelTitle.split(',')[0]?.trim() || '';
+                        const youtubeQuery = `${place.name} ${firstChannel}`.trim();
+                        const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
 
-                          // 네이버 검색: 업체명 + 지역(주소 앞 2단어 중 '도' 제외)
-                          const addressParts = place.address ? place.address.split(' ') : [];
-                          // '도'로 끝나는 단어 제외 (예: 경기도, 강원도 등)
-                          const regionParts = addressParts.slice(0, 3).filter(part => !part.endsWith('도'));
-                          const region = regionParts.slice(0, 2).join(' ');
-                          const naverSearchQuery = `${place.name} ${region}`.trim();
-                          const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
+                        // 네이버 검색
+                        const addressParts = place.address ? place.address.split(' ') : [];
+                        const regionParts = addressParts.slice(0, 3).filter(part => !part.endsWith('도'));
+                        const region = regionParts.slice(0, 2).join(' ');
+                        const naverSearchQuery = `${place.name} ${region}`.trim();
+                        const naverUrl = `https://search.naver.com/search.naver?query=${encodeURIComponent(naverSearchQuery)}`;
 
-                          const address = place.road_address || place.address;
+                        const address = place.road_address || place.address;
 
-                          return (
-                            <div
-                              key={place.id}
-                              className={`${styles.item} ${styles.itemSelected}`}
-                              onClick={() => handlePlaceClick(place)}
-                            >
-                              <div className={styles.itemInfo}>
-                                <div className={styles.itemName}>{title}</div>
+                        return (
+                          <div
+                            key={place.id}
+                            className={`${styles.item} ${styles.itemSelected}`}
+                            onClick={() => handlePlaceClick(place)}
+                          >
+                            <div className={styles.itemInfo}>
+                              <div className={styles.itemName}>{title}</div>
 
-                                {videoThumbnailUrl ? (
-                                  <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden', marginBottom: '10px' }}>
-                                    <img src={videoThumbnailUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                  </div>
-                                ) : (
-                                  <div style={{ width: '100%', height: '160px', borderRadius: '8px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', fontSize: '12px', color: '#888' }}>
-                                    이미지 준비중
-                                  </div>
-                                )}
-
-                                <div className={styles.itemChannels}>
-                                  📺 {channelTitle}
+                              {videoThumbnailUrl ? (
+                                <div style={{ width: '100%', aspectRatio: '16/9', borderRadius: '8px', overflow: 'hidden', marginBottom: '10px' }}>
+                                  <img src={videoThumbnailUrl} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                 </div>
-                                {place.menu_primary && (
-                                  <div className={styles.itemMenus}>
-                                    🍽️ {place.menu_primary}
-                                  </div>
-                                )}
-                                {address && (
-                                  <div className={styles.itemRow}>
-                                    <span>📍</span>
-                                    <span>{address}</span>
-                                  </div>
-                                )}
-                                {place.phone && place.phone.trim().length > 0 && (
-                                  <div className={styles.itemRow}>
-                                    <span>📞</span>
-                                    <span>{place.phone}</span>
-                                  </div>
-                                )}
-                                {comment && (
-                                  <div className={styles.itemCommentDetailed} style={{ margin: '8px 0', fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                                    “{comment}”
-                                  </div>
-                                )}
-                                <div className={styles.detailActions}>
-                                  <a
-                                    href={youtubeUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={`${styles.detailButton} ${styles.youtubeButton}`}
-                                  >
-                                    영상 보기
-                                  </a>
-                                  <a
-                                    href={naverUrl}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    className={`${styles.detailButton} ${styles.naverButton}`}
-                                  >
-                                    <span>
-                                      네이버
-                                      <br />
-                                      검색
-                                    </span>
-                                  </a>
+                              ) : (
+                                <div style={{ width: '100%', height: '160px', borderRadius: '8px', background: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '10px', fontSize: '12px', color: '#888' }}>
+                                  이미지 준비중
                                 </div>
+                              )}
 
-                                {/* [AD] Google AdSense Banner (Mobile) */}
-                                <AdSenseBanner />
-
+                              <div className={styles.itemChannels}>
+                                📺 {channelTitle}
+                              </div>
+                              {place.menu_primary && (
+                                <div className={styles.itemMenus}>
+                                  🍽️ {place.menu_primary}
+                                </div>
+                              )}
+                              {address && (
+                                <div className={styles.itemRow}>
+                                  <span>📍</span>
+                                  <span>{address}</span>
+                                </div>
+                              )}
+                              {place.phone && place.phone.trim().length > 0 && (
+                                <div className={styles.itemRow}>
+                                  <span>📞</span>
+                                  <span>{place.phone}</span>
+                                </div>
+                              )}
+                              {comment && (
+                                <div className={styles.itemCommentDetailed} style={{ margin: '8px 0', fontStyle: 'italic', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                  “{comment}”
+                                </div>
+                              )}
+                              <div className={styles.detailActions}>
+                                <a
+                                  href={youtubeUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className={`${styles.detailButton} ${styles.youtubeButton}`}
+                                >
+                                  영상 보기
+                                </a>
+                                <a
+                                  href={naverUrl}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className={`${styles.detailButton} ${styles.naverButton}`}
+                                >
+                                  <span>네이버<br />검색</span>
+                                </a>
                               </div>
                             </div>
-                          );
-                        }
+                          </div>
+                        );
+                      })()}
+
+                      {/* [LIST] 나머지 일반 리스트 */}
+                      {paginatedPlaces.map(place => {
+                        const title = place.name;
+                        const channelTitle = place.channel_title;
+                        const menuImageUrl = place.image_url;
+                        const comment = place.best_comment;
 
                         return (
                           <div
