@@ -15,6 +15,7 @@ const MapComponent = dynamic(() => import('./Map'), { ssr: false });
 interface MobileShellProps {
   allPlaces: Place[];
   currentSearch: string;
+  onCurrentSearchChange?: (val: string) => void;
   searchTrigger?: number;
   onMapMove: (visible: Place[]) => void;
   onManualInteraction?: () => void;
