@@ -143,6 +143,8 @@ export default function MobileShell({
   // 검색 핸들러
   const handleSearch = useCallback((keyword: string) => {
     const trimmed = keyword.trim();
+    if (onCurrentSearchChange) onCurrentSearchChange(trimmed);
+
     if (trimmed) {
       // 1) 전체 데이터(allPlaces)에서 업체명 우선 필터링
       const nameMatches = allPlaces.filter(p => p.name.includes(trimmed));
@@ -190,7 +192,7 @@ export default function MobileShell({
       setSelectedPlaceId(null);
       router.replace('/', { scroll: false });
     }
-  }, [allPlaces, filteredPlaces, setPlaces, setSelectedPlaceId, setSheetState, setSearchKeyword, router]);
+  }, [allPlaces, filteredPlaces, setPlaces, setSelectedPlaceId, setSheetState, setSearchKeyword, router, onCurrentSearchChange]);
 
   // 카테고리 토글
   const handleCategoryToggle = useCallback((category: string) => {
