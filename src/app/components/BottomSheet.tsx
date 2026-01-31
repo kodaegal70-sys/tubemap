@@ -5,6 +5,7 @@ import { useMobile } from '../contexts/MobileContext';
 import styles from './BottomSheet.module.css';
 import { Place } from '@/data/places';
 import DiscoveryPanel from './DiscoveryPanel';
+import AdSenseBanner from './AdSenseBanner';
 
 interface Props {
   places: Place[];
@@ -293,6 +294,10 @@ export default function BottomSheet({
                                     </span>
                                   </a>
                                 </div>
+
+                                {/* [AD] Google AdSense Banner (Mobile) */}
+                                <AdSenseBanner />
+
                               </div>
                             </div>
                           );

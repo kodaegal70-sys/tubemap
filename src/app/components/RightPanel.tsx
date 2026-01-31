@@ -5,6 +5,7 @@ import { Place } from '@/data/places';
 import FilterPanel from './FilterPanel';
 import { useState, useEffect, useRef } from 'react';
 import AdSlot from './AdSlot';
+import AdSenseBanner from './AdSenseBanner';
 
 type Props = {
   places: Place[];
@@ -199,6 +200,10 @@ export default function RightPanel({
                               네이버 검색
                             </a>
                           </div>
+
+                          {/* [AD] Google AdSense Banner */}
+                          <AdSenseBanner />
+
                         </div>
                       );
                     })()}

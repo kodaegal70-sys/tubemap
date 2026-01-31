@@ -64,15 +64,13 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning={true}>
       <head>
-        {isAdsenseEnabled && adsenseClient ? (
-          <Script
-            id="adsense-auto-ads"
-            async
-            strategy="afterInteractive"
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`}
-            crossOrigin="anonymous"
-          />
-        ) : null}
+        <Script
+          id="adsense-init"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2499479542127705"
+          crossOrigin="anonymous"
+          strategy="afterInteractive"
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning={true}>
         {children}
