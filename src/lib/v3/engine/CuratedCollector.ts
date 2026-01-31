@@ -43,7 +43,7 @@ export class CuratedCollector {
 
             if (!info) {
                 const [fetchedKakao, bestCommentResult] = await Promise.all([
-                    this.kakao.getPlaceDetails(kakaoId, videoInfo.title),
+                    this.kakao.getPlaceDetails(kakaoId, { name: videoInfo.title }),
                     this.youtube.getBestComment(videoId)
                 ]);
                 info = fetchedKakao;
