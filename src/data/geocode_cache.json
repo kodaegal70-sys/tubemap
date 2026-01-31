@@ -1,0 +1,14 @@
+{
+  "서울 강남구 선릉로129길 5 1층": {
+    "lat": 37.5163206,
+    "lng": 127.0411222,
+    "provider": "opencage",
+    "confidence": 9
+  },
+  "서울 송파구 오금로11길 10 1층": {
+    "lat": 37.5154261,
+    "lng": 127.1110745,
+    "provider": "opencage",
+    "confidence": 9
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "별미곱창 본점",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 송파구 오금로11길 11 1층",
+        "geocodeAddress": "서울 송파구 오금로11길 11"
+      }
+    },
+    "category": {
+      "fullname": ""
+    },
+    "wgs84": {
+      "lat": 37.5146355841934,
+      "lon": 127.108338371276
+    },
+    "phonenum": "02-413-3610",
+    "menu_items": [
+      "곱창",
+      "막창",
+      "볶음밥"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

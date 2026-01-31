@@ -10,8 +10,7 @@ import AdSlot from './components/AdSlot';
 import MobileShell from './components/MobileShell';
 import InfoBar from './components/InfoBar';
 import { supabase } from '@/lib/supabaseClient';
-import { Place, DUMMY_PLACES, checkCategoryMatch } from '@/data/places';
-import { normalizeMediaName } from '@/lib/v3/utils/media';
+import { Place, checkCategoryMatch } from '@/data/places';
 
 const MapComponent = dynamic(() => import('./components/Map'), { ssr: false });
 
@@ -24,19 +23,22 @@ function DesktopLayout({
   activeCategoryFilters,
   currentSearch,
   fitBoundsTrigger,
+  restoreView,
   handleMapMove,
+  onMapStateChange,
   handleManualInteraction,
   handleMarkerClick,
   handleFilterChange,
   setActiveCategoryFilters,
   setCurrentSearch,
+  handleSearch,
   setFitBoundsTrigger,
   myLocation,
   searchKeyword,
-  handleSearch,
   onMyLocation,
   rightPanelTab,
   setRightPanelTab,
+  onClearFocus,
 }: {
   allPlaces: Place[];
   filteredPlaces: Place[];
@@ -46,7 +48,9 @@ function DesktopLayout({
   activeCategoryFilters: string[];
   currentSearch: string;
   fitBoundsTrigger: number;
+  restoreView: { center: { lat: number; lng: number }; level: number; trigger: number } | null;
   handleMapMove: (visible: Place[]) => void;
+  onMapStateChange: (center: { lat: number; lng: number }, zoom: number, isManual: boolean) => void;
   handleManualInteraction: () => void;
   handleMarkerClick: (p: Place) => void;
   handleFilterChange: (filters: { media: string[] }) => void;
@@ -59,6 +63,7 @@ function DesktopLayout({
   onMyLocation: () => void;
   rightPanelTab: 'list' | 'discovery';
   setRightPanelTab: (tab: 'list' | 'discovery') => void;
+  onClearFocus: () => void;
 }) {
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -67,15 +72,17 @@ function DesktopLayout({
         places={filteredPlaces}
         focusedPlace={focusedPlace}
         onMapMove={handleMapMove}
+        onMapStateChange={onMapStateChange}
         onManualInteraction={handleManualInteraction}
         onMarkerClick={handleMarkerClick}
         fitBoundsTrigger={fitBoundsTrigger}
+        restoreView={restoreView}
         isMobile={false}
         myLocation={myLocation}
         searchKeyword={searchKeyword}
       />
 
-      {/* 좌측 상단 플로팅 검색/카테고리 (직방식 상단 패널) */}
+      {/* 좌측 상단 플로팅 검색/카테고리 */}
       <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 1100 }}>
         <TopSearchBar
           value={currentSearch}
@@ -94,19 +101,19 @@ function DesktopLayout({
         />
       </div>
 
-      {/* 우측 관통 패널 (리스트 / 디스커버리 탭) */}
+      {/* 우측 패널 */}
       <RightPanel
         places={sidebarPlaces}
         allPlaces={allPlaces}
         activeMediaFilters={activeMediaFilters}
         onPlaceClick={handleMarkerClick}
         onFilterChange={handleFilterChange}
+        onClearFocus={onClearFocus}
         focusedPlace={focusedPlace}
         tab={rightPanelTab}
         onTabChange={setRightPanelTab}
       />
 
-      {/* 하단 애드센스 광고 (클릭 시 확장) */}
       <AdSlot type="MAP_BOTTOM" id="map-bottom-ad" />
     </div>
   );
@@ -117,7 +124,7 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const placeIdParam = searchParams.get('placeId');
 
-  const [allPlaces, setAllPlaces] = useState<Place[]>(DUMMY_PLACES);
+  const [allPlaces, setAllPlaces] = useState<Place[]>([]);
   const [activeMediaFilters, setActiveMediaFilters] = useState<string[]>([]);
   const [activeCategoryFilters, setActiveCategoryFilters] = useState<string[]>([]);
   const [visiblePlaces, setVisiblePlaces] = useState<Place[] | null>(null);
@@ -131,6 +138,11 @@ function HomeContent() {
   const [myLocation, setMyLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [rightPanelTab, setRightPanelTab] = useState<'list' | 'discovery'>('list');
 
+  // [NEW] 지도 시점 복구용 상태
+  const [lastManualView, setLastManualView] = useState<{ center: { lat: number; lng: number }; level: number } | null>(null);
+  const [preFocusView, setPreFocusView] = useState<{ center: { lat: number; lng: number }; level: number } | null>(null);
+  const [restoreView, setRestoreView] = useState<{ center: { lat: number; lng: number }; level: number; trigger: number } | null>(null);
+
   useEffect(() => {
     setMounted(true);
     const mql = window.matchMedia('(max-width: 768px)');
@@ -142,7 +154,17 @@ function HomeContent() {
     return () => mql.removeEventListener('change', onChange);
   }, []);
 
-  // [URL -> State] 상세 정보 동기화
+  // [MAP STATE TRACKING] 사용자의 탐색 시점 기억 (상세 보기 진입 전 상태 보존)
+  const handleMapStateChange = useCallback((center: { lat: number; lng: number }, level: number, isManual: boolean) => {
+    // 상세 페이지가 아닐 때만 업데이트
+    if (!placeIdParam) {
+      // 1) 수동 조작이거나, 2) 아직 저장된 시점이 없다면(초기 로드 등) 저장
+      if (isManual || !preFocusView) {
+        setPreFocusView({ center, level });
+      }
+    }
+  }, [placeIdParam, preFocusView]);
+
   useEffect(() => {
     if (!placeIdParam) {
       setFocusedPlace(null);
@@ -154,37 +176,25 @@ function HomeContent() {
     }
   }, [placeIdParam, allPlaces]);
 
-  // [FILTER] 마커 표시용 필터링
   const filteredPlaces = useMemo(() => {
     return allPlaces.filter(p => {
-      const mediaStr = p.media_label || p.media;
+      const mediaStr = p.channel_title;
       const mediaMatch = activeMediaFilters.length === 0 ||
-        (mediaStr?.split(',').some(m => {
-          const rawMedia = m.split('|')[0]?.trim();
-          const normalized = normalizeMediaName(rawMedia);
-          return activeMediaFilters.includes(normalized);
-        }) ?? false);
+        (mediaStr?.split(',').some(m => activeMediaFilters.includes(m.trim())) ?? false);
       const catMatch = checkCategoryMatch(p, activeCategoryFilters);
       return mediaMatch && catMatch;
     });
   }, [allPlaces, activeMediaFilters, activeCategoryFilters]);
 
-  // [LIST SYNC] 리스트 표시용
-  // - "현재 지도 화면 안에 보이는 핀"과 리스트 개수가 항상 일치하도록 구성
   const sidebarPlaces = useMemo(() => {
-    // 1) 필터 + 검색 적용
     let base = filteredPlaces;
     if (currentSearch) {
       base = base.filter((p) => p.name.includes(currentSearch));
     }
-
-    // 2) 지도 화면 안에 있는 핀만 리스트에 노출 (개수 1:1 일치)
     if (visiblePlaces !== null) {
       const visibleIds = new Set(visiblePlaces.map((p) => p.id));
       return base.filter((p) => visibleIds.has(p.id));
     }
-
-    // 아직 visible 정보가 없으면 필터/검색 결과 전체 노출
     return base;
   }, [currentSearch, filteredPlaces, visiblePlaces]);
 
@@ -192,49 +202,32 @@ function HomeContent() {
     setVisiblePlaces(visible);
   }, []);
 
-  // 스마트 검색 핸들러 (모바일과 동일한 로직)
   const handleSearch = useCallback((keyword: string) => {
     const trimmed = keyword.trim();
     if (trimmed) {
       if (trimmed.length >= 2) {
-        // 1) 전체 데이터(allPlaces)에서 상호명 검색 점수 계산
         const scoredMatches = allPlaces
           .map(p => {
             let score = 0;
             const name = p.name.toLowerCase();
             const lowerTrimmed = trimmed.toLowerCase();
-
-            if (name === lowerTrimmed) {
-              score = 100; // 정확히 일치
-            } else if (name.startsWith(lowerTrimmed)) {
-              score = 80; // 검색어로 시작
-            } else if (name.includes(lowerTrimmed)) {
-              score = 50 + (lowerTrimmed.length * 2); // 포함됨 (매칭 길이에 따른 가산점)
-            }
-
+            if (name === lowerTrimmed) score = 100;
+            else if (name.startsWith(lowerTrimmed)) score = 80;
+            else if (name.includes(lowerTrimmed)) score = 50 + (lowerTrimmed.length * 2);
             return { place: p, score };
           })
           .filter(match => match.score > 0)
-          .sort((a, b) => {
-            if (b.score !== a.score) return b.score - a.score;
-            // 점수가 같으면 상호명이 짧은 것 우선 (정확도)
-            return a.place.name.length - b.place.name.length;
-          });
+          .sort((a, b) => (b.score !== a.score ? b.score - a.score : a.place.name.length - b.place.name.length));
 
         if (scoredMatches.length > 0) {
-          // 업체명 매칭이 있으면 해당 리스트 필터 적용 및 최상위 업체 자동 선택
           setCurrentSearch(trimmed);
           const bestMatch = scoredMatches[0].place;
-
           router.push(`?placeId=${bestMatch.id}`, { scroll: false });
-
-          // 업체가 발견되었으므로 지도의 "지역/외부 검색(searchKeyword)"은 수행하지 않음
           setSearchKeyword('');
           return;
         }
       }
 
-      // 2) 업체명 일치가 없거나 검색어가 짧은 경우 (지역 검색 혹은 주소 검색)
       setCurrentSearch(trimmed);
       setSearchKeyword(trimmed);
       setSearchTrigger(prev => prev + 1);
@@ -246,18 +239,34 @@ function HomeContent() {
     }
   }, [allPlaces, router]);
 
-  // [INTERACTION] 수동 조작 시 상세 해제 및 키보드 닫기 (검색어는 유지)
-  const handleManualInteraction = useCallback(() => {
-    // 키보드 닫기
+  // [NEW] 지도 수동 조작 핸들러 (단순히 상세 보기만 닫음, 시점 복구 X)
+  const handleManualMapInteraction = useCallback(() => {
+    if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    // 상세 보기가 켜져있을 때만 닫기
+    if (placeIdParam) {
+      router.replace('/', { scroll: false });
+    }
+  }, [router, placeIdParam]);
+
+  const handleBackToList = useCallback(() => {
     if (typeof document !== 'undefined' && document.activeElement instanceof HTMLElement) {
       document.activeElement.blur();
     }
 
-    if (placeIdParam) {
-      // 업체 상세만 해제하고 검색어는 유지함 (유저 피드백 반영)
-      router.replace('/', { scroll: false });
+    // [RESTORATION] 버튼 클릭시에만 이전 시점으로 지도 되돌리기
+    if (preFocusView) {
+      setRestoreView({
+        ...preFocusView,
+        trigger: (restoreView?.trigger || 0) + 1
+      });
     }
-  }, [placeIdParam, router]);
+
+    setCurrentSearch('');
+    setSearchKeyword('');
+    router.replace('/', { scroll: false });
+  }, [router, preFocusView, restoreView]);
 
   const handleMarkerClick = useCallback((p: Place) => {
     router.push(`?placeId=${p.id}`, { scroll: false });
@@ -270,47 +279,27 @@ function HomeContent() {
   const handleMyLocation = useCallback(() => {
     if (!navigator.geolocation) return;
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setMyLocation({
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        });
-      },
-      (err) => {
-        console.error('geolocation error', err);
-      },
+      (pos) => setMyLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      (err) => console.error('geolocation error', err)
     );
   }, []);
 
-  // [OFFLINE MODE SWITCH]
   const ENABLE_OFFLINE_MODE = true;
-
   useEffect(() => {
     if (ENABLE_OFFLINE_MODE) {
-      console.log("⚠️ Offline Mode: Loading from local JSON...");
-      import('@/data/offline_places.json')
-        .then((mod) => {
-          // Default export or the module itself
-          // It's likely an array based on how we write it
-          const raw = mod.default || mod;
-          // Need to cast or validate
-          if (Array.isArray(raw)) {
-            // Ensure dummy IDs are strings or numbers as component expects
-            const formatted = (raw as any[]).map(p => ({
-              ...p,
-              // Fix ID if missing (engine generates kakao_place_id as string, we can use it as id)
-              id: p.id || p.kakao_place_id
-            }));
-            setAllPlaces(formatted);
-          }
-        })
-        .catch(err => {
-          console.error("Failed to load offline data", err);
-        });
-    } else if (supabase) {
-      supabase.from('places').select('*').then(({ data }) => {
-        if (data && data.length > 0) setAllPlaces(data);
-      });
+      const fetchOfflineData = () => {
+        fetch('/api/offline-places')
+          .then(res => res.json())
+          .then(raw => {
+            if (Array.isArray(raw)) {
+              setAllPlaces(raw.map(p => ({ ...p, id: p.id || p.kakao_place_id })));
+            }
+          })
+          .catch(e => console.error("Live sync failed", e));
+      };
+      fetchOfflineData();
+      const interval = setInterval(fetchOfflineData, 5000);
+      return () => clearInterval(interval);
     }
   }, [supabase]);
 
@@ -318,14 +307,7 @@ function HomeContent() {
 
   return (
     <MobileProvider>
-      <main style={{
-        width: '100vw',
-        height: '100dvh',
-        position: 'relative',
-        overflow: 'hidden',
-        overscrollBehavior: 'none'
-      }}>
-        {/* 데스크톱 레이아웃 (조건부 마운트) */}
+      <main style={{ width: '100vw', height: '100dvh', position: 'relative', overflow: 'hidden', overscrollBehavior: 'none' }}>
         {!isMobileView && (
           <div className="hide-mobile" style={{ height: '100%' }}>
             <DesktopLayout
@@ -337,8 +319,10 @@ function HomeContent() {
               activeCategoryFilters={activeCategoryFilters}
               currentSearch={currentSearch}
               fitBoundsTrigger={fitBoundsTrigger}
+              restoreView={restoreView}
               handleMapMove={handleMapMove}
-              handleManualInteraction={handleManualInteraction}
+              onMapStateChange={handleMapStateChange}
+              handleManualInteraction={handleManualMapInteraction}
               handleMarkerClick={handleMarkerClick}
               handleFilterChange={handleFilterChange}
               setActiveCategoryFilters={setActiveCategoryFilters}
@@ -350,19 +334,23 @@ function HomeContent() {
               onMyLocation={handleMyLocation}
               rightPanelTab={rightPanelTab}
               setRightPanelTab={setRightPanelTab}
+              onClearFocus={handleBackToList}
             />
           </div>
         )}
 
-        {/* 모바일 레이아웃 (조건부 마운트) */}
         {isMobileView && (
           <div className="hide-desktop" style={{ height: '100%' }}>
             <MobileShell
               allPlaces={allPlaces}
               currentSearch={currentSearch}
+              onCurrentSearchChange={setCurrentSearch}
               searchTrigger={searchTrigger}
               onMapMove={handleMapMove}
-              onManualInteraction={handleManualInteraction}
+              onManualInteraction={handleManualMapInteraction}
+              onClearFocus={handleBackToList}
+              restoreView={restoreView}
+              onMapStateChange={handleMapStateChange}
             />
           </div>
         )}

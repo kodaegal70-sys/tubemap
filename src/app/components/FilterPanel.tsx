@@ -44,37 +44,32 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
         const typeMap: { [key: string]: 'YOUTUBE' | 'BROADCAST' | 'OTHER' } = {};
 
         places.forEach(p => {
-            const mediaStr = p.media_label || p.media;
-            if (!mediaStr) return; // 미디어 정보가 없으면 스킵
-            const parts = mediaStr.split('|');
-            const raw = normalizeMediaName(parts[0]?.trim()); // 정규화 적용
-            if (!raw) return;
+            const mediaStr = p.channel_title;
+            if (!mediaStr) return;
+            const mediaEntries = mediaStr.split(',').map((m: string) => m.trim());
 
-            counts[raw] = (counts[raw] || 0) + 1;
+            mediaEntries.forEach((entry: string) => {
+                const raw = entry;
+                if (!raw) return;
 
-            // 이미 분류된 경우 스킵
-            if (typeMap[raw]) return;
+                counts[raw] = (counts[raw] || 0) + 1;
 
-            // 1. 데이터 자체에 힌트가 있는지 (예: "성시경 (유튜브)")
-            // 2. 키워드 매칭
-            const lowerRaw = raw.toLowerCase();
-            let identifiedType: 'YOUTUBE' | 'BROADCAST' | 'OTHER' = 'OTHER';
+                if (typeMap[raw]) return;
 
-            if (MEDIA_KEYWORDS.YOUTUBE_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
-                identifiedType = 'YOUTUBE';
-            } else if (MEDIA_KEYWORDS.BROADCAST_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
-                identifiedType = 'BROADCAST';
-            } else {
-                // 기본적으로 유명 유튜버 이름이 포함되면 유튜브로 간주 (보조)
-                // 하지만 명시적이지 않으면 '기타'로 빠지거나 전체에서만 노출
-                // 여기서는 편의상 기본값을 'BROADCAST'로 할지 'YOUTUBE'로 할지 결정해야 하는데,
-                // 일단 데이터에 힌트가 없다면 'OTHER'로 두고 전체 탭에만 나오게 함.
-                // 단, '성시경', '풍자' 등은 확실히 유튜브임.
-                if (['성시경', '풍자', '쯔양', '히밥', '백종원'].some(name => lowerRaw.includes(name))) {
+                const lowerRaw = raw.toLowerCase();
+                let identifiedType: 'YOUTUBE' | 'BROADCAST' | 'OTHER' = 'OTHER';
+
+                if (MEDIA_KEYWORDS.YOUTUBE_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
                     identifiedType = 'YOUTUBE';
+                } else if (MEDIA_KEYWORDS.BROADCAST_TYPE.some(k => lowerRaw.includes(k.toLowerCase()))) {
+                    identifiedType = 'BROADCAST';
+                } else {
+                    if (['성시경', '풍자', '쯔양', '히밥', '백종원'].some(name => lowerRaw.includes(name))) {
+                        identifiedType = 'YOUTUBE';
+                    }
                 }
-            }
-            typeMap[raw] = identifiedType;
+                typeMap[raw] = identifiedType;
+            });
         });
 
         // 빈도수 내림차순 정렬
@@ -188,10 +183,10 @@ export default function FilterPanel({ places, onFilterChange, selectedMediaFilte
                             {paginatedMediaList.map((media, index) => {
                                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
                                 const count = places.filter(p => {
-                                    const mediaStr = p.media_label || p.media;
+                                    const mediaStr = p.channel_title;
                                     if (!mediaStr) return false;
-                                    const mediaName = normalizeMediaName(mediaStr.split('|')[0]?.trim());
-                                    return mediaName === media;
+                                    const mediaEntries = mediaStr.split(',').map((m: string) => m.trim());
+                                    return mediaEntries.some((entry: string) => entry === media);
                                 }).length;
 
                                 return (

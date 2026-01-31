@@ -15,12 +15,24 @@ const MapComponent = dynamic(() => import('./Map'), { ssr: false });
 interface MobileShellProps {
   allPlaces: Place[];
   currentSearch: string;
-  searchTrigger: number;
+  searchTrigger?: number;
   onMapMove: (visible: Place[]) => void;
-  onManualInteraction: () => void;
+  onManualInteraction?: () => void;
+  onClearFocus?: () => void; // [NEW] '이전 목록으로' 전용 핸들러
+  restoreView?: { center: { lat: number; lng: number }; level: number; trigger: number } | null;
+  onMapStateChange?: (center: { lat: number; lng: number }, zoom: number, isManual: boolean) => void;
 }
 
-export default function MobileShell({ allPlaces, currentSearch, searchTrigger: parentSearchTrigger, onMapMove, onManualInteraction }: MobileShellProps) {
+export default function MobileShell({
+  allPlaces,
+  currentSearch,
+  searchTrigger: parentSearchTrigger,
+  onMapMove,
+  onManualInteraction,
+  onClearFocus,
+  restoreView,
+  onMapStateChange,
+}: MobileShellProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const placeIdParam = searchParams.get('placeId');
@@ -76,12 +88,11 @@ export default function MobileShell({ allPlaces, currentSearch, searchTrigger: p
       const catMatch = checkCategoryMatch(p, categoryFilter);
 
       // 디스커버리 필터 (미디어)
-      const mediaStr = p.media_label || p.media;
+      const mediaStr = p.channel_title;
       const mediaMatch = discoveryFilter.selectedMedia.length === 0 ||
         (mediaStr?.split(',').some(m => {
-          const rawMedia = m.split('|')[0]?.trim();
-          const normalized = normalizeMediaName(rawMedia);
-          return discoveryFilter.selectedMedia.includes(normalized);
+          const rawMedia = m.trim();
+          return discoveryFilter.selectedMedia.includes(rawMedia);
         }) ?? false);
 
       return catMatch && mediaMatch;
@@ -97,21 +108,7 @@ export default function MobileShell({ allPlaces, currentSearch, searchTrigger: p
     onMapMove(visible);
   }, [setPlaces, onMapMove, sheetTab]);
 
-  // 필터 변경 시 places 업데이트 (리스트 탭일 때만)
-  useEffect(() => {
-    if (sheetTab === 'list') {
-      // 필터링된 장소 중 일부를 표시 (최대 50개)
-      setPlaces(filteredPlaces.slice(0, 50));
-    }
-  }, [filteredPlaces, sheetTab, setPlaces]);
-
-  // 탭 변경 시 places 업데이트
-  useEffect(() => {
-    if (sheetTab === 'list') {
-      // 리스트 탭으로 전환 시 필터링된 장소 표시
-      setPlaces(filteredPlaces.slice(0, 50));
-    }
-  }, [sheetTab, filteredPlaces, setPlaces]);
+  // 필터 변경 시 처리 (필요한 경우 여기에 추가 로직 작성 가능하지만, 현재는 onMapMove에 의존)
 
   // 마커 클릭 핸들러
   const handleMarkerClick = useCallback((place: Place) => {
@@ -127,11 +124,17 @@ export default function MobileShell({ allPlaces, currentSearch, searchTrigger: p
     router.push(`?placeId=${place.id}`, { scroll: false });
   }, [setSelectedPlaceId, setSheetState, router]);
 
-  // 포커스 해제 핸들러 (토글용)
+  // 포커스 해제 핸들러 (이전 목록으로 버튼 대응)
   const handleClearFocus = useCallback(() => {
-    setSelectedPlaceId(null);
-    router.replace('/', { scroll: false });
-  }, [setSelectedPlaceId, router]);
+    if (onClearFocus) {
+      // 부모(page.tsx)의 handleBackToList를 호출하여 시점 복구와 상태 초기화를 통합 실행
+      onClearFocus();
+    } else {
+      setSelectedPlaceId(null);
+      setSearchKeyword('');
+      router.replace('/', { scroll: false });
+    }
+  }, [setSelectedPlaceId, router, onClearFocus]);
 
   // 검색 핸들러
   const handleSearch = useCallback((keyword: string) => {
@@ -141,7 +144,7 @@ export default function MobileShell({ allPlaces, currentSearch, searchTrigger: p
       const nameMatches = allPlaces.filter(p => p.name.includes(trimmed));
       const otherMatches = allPlaces.filter(p =>
         !p.name.includes(trimmed) &&
-        (p.address?.includes(trimmed) || p.description?.includes(trimmed))
+        (p.address?.includes(trimmed) || p.best_comment?.includes(trimmed))
       );
 
       const allResults = [...nameMatches, ...otherMatches];
@@ -262,9 +265,11 @@ export default function MobileShell({ allPlaces, currentSearch, searchTrigger: p
         places={filteredPlaces}
         focusedPlace={focusedPlace}
         onMapMove={handleMapMove}
+        onMapStateChange={onMapStateChange}
+        onManualInteraction={onManualInteraction}
         onMarkerClick={handleMarkerClick}
-        onManualInteraction={handleInternalManualInteraction}
         fitBoundsTrigger={fitBoundsTrigger}
+        restoreView={restoreView}
         isMobile={true}
         mobileSheetState={sheetState}
         myLocation={myLocation}

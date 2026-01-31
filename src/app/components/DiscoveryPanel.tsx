@@ -45,13 +45,12 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
     const typeMap: { [key: string]: 'YOUTUBE' | 'BROADCAST' | 'OTHER' } = {};
 
     places.forEach(p => {
-      const mediaStr = p.media_label || p.media;
+      const mediaStr = p.channel_title;
       if (!mediaStr) return;
       const mediaEntries = mediaStr.split(',').map((m: string) => m.trim());
 
       mediaEntries.forEach((entry: string) => {
-        const parts = entry.split('|');
-        const raw = normalizeMediaName(parts[0]?.trim());
+        const raw = entry;
         if (!raw) return;
 
         counts[raw] = (counts[raw] || 0) + 1;
@@ -165,10 +164,10 @@ export default function DiscoveryPanel({ places, discoveryFilter, onDiscoveryFil
               {paginatedMediaList.map((media, index) => {
                 const overallIndex = (currentPage - 1) * ITEMS_PER_PAGE + index;
                 const count = places.filter(p => {
-                  const mediaStr = p.media_label || p.media;
+                  const mediaStr = p.channel_title;
                   if (!mediaStr) return false;
                   const mediaEntries = mediaStr.split(',').map((m: string) => m.trim());
-                  return mediaEntries.some((entry: string) => normalizeMediaName(entry.split('|')[0]?.trim()) === media);
+                  return mediaEntries.some((entry: string) => entry === media);
                 }).length;
 
                 return (

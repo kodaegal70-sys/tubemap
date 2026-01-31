@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "서울복집",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 중구 명동길 25-6 1층",
+        "geocodeAddress": "서울 중구 명동길 25-6"
+      }
+    },
+    "category": {
+      "fullname": ""
+    },
+    "wgs84": {
+      "lat": 37.563986878949244,
+      "lon": 126.98376682435733
+    },
+    "phonenum": "02-3789-9389",
+    "menu_items": [
+      "복튀김",
+      "복지리",
+      "복찜"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}

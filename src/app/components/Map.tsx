@@ -7,10 +7,11 @@ type Props = {
     places: Place[];
     focusedPlace?: Place | null;
     onMapMove?: (visiblePlaces: Place[]) => void;
-    onMapStateChange?: (center: { lat: number; lng: number }, zoom: number) => void;
+    onMapStateChange?: (center: { lat: number; lng: number }, zoom: number, isManual: boolean) => void;
     onMarkerClick?: (place: Place) => void;
     onManualInteraction?: () => void;
     fitBoundsTrigger?: number;
+    restoreView?: { center: { lat: number; lng: number }; level: number; trigger: number } | null;
     isMobile?: boolean;
     mobileSheetState?: 'peek' | 'half' | 'full';
     myLocation?: { lat: number; lng: number } | null;
@@ -23,21 +24,21 @@ declare global { interface Window { kakao: any; } }
 const BASE_IMAGE_SRC = "/images/logo.png";
 const ACTIVE_IMAGE_SRC = "/images/logo.png";
 
-export default function MapComponent({ places, focusedPlace, onMapMove, onMapStateChange, onMarkerClick, onManualInteraction, fitBoundsTrigger, isMobile, mobileSheetState, myLocation, searchKeyword, searchTrigger }: Props) {
+export default function MapComponent({ places, focusedPlace, onMapMove, onMapStateChange, onMarkerClick, onManualInteraction, fitBoundsTrigger, restoreView, isMobile, mobileSheetState, myLocation, searchKeyword, searchTrigger }: Props) {
     const mapRef = useRef<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [isSdkLoaded, setIsSdkLoaded] = useState(false);
-
+    const isProgrammaticMove = useRef(false);
+    const lastRestoreTrigger = useRef(0); // [NEW] 중복 복구 방지 가드
     // [STABILITY] 최신 props를 항상 참조할 수 있도록 Ref 사용
-    const propsRef = useRef({ places, onMapMove, onManualInteraction, isMobile, mobileSheetState });
+    const propsRef = useRef({ places, onMapMove, onMapStateChange, onManualInteraction, isMobile, mobileSheetState });
     const lastFocusTime = useRef<number>(0);
     useEffect(() => {
-        propsRef.current = { places, onMapMove, onManualInteraction, isMobile, mobileSheetState };
-    }, [places, onMapMove, onManualInteraction, isMobile, mobileSheetState]);
+        propsRef.current = { places, onMapMove, onMapStateChange, onManualInteraction, isMobile, mobileSheetState };
+    }, [places, onMapMove, onMapStateChange, onManualInteraction, isMobile, mobileSheetState]);
 
     const markersRef = useRef<Array<{ marker: any; place: Place }>>([]);
     const clustererRef = useRef<any>(null);
-    const isProgrammaticMove = useRef(false);
     const lastFitBoundsTrigger = useRef(0);
     const [activePlaceId, setActivePlaceId] = useState<number | string | null>(null);
 
@@ -81,19 +82,18 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
     const calculateVisible = useCallback(() => {
         const map = mapRef.current;
         if (!map) return;
-        const { places: latestPlaces, onMapMove: latestOnMapMove } = propsRef.current;
-        if (!latestOnMapMove) return;
-
         // [심플] 카카오맵 bounds 기준으로 현재 화면 안의 핀만 계산
         const bounds = map.getBounds();
         if (!bounds) return;
 
-        const visible = latestPlaces.filter((p) => {
+        const visible = propsRef.current.places.filter((p) => {
             const latlng = new window.kakao.maps.LatLng(p.lat, p.lng);
             return bounds.contain(latlng);
         });
 
-        latestOnMapMove(visible);
+        if (propsRef.current.onMapMove) {
+            propsRef.current.onMapMove(visible);
+        }
     }, []);
 
     useEffect(() => {
@@ -117,9 +117,14 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
 
         const handleIdle = () => {
             calculateVisible();
-            if (onMapStateChange) {
+            if (propsRef.current.onMapStateChange) {
                 const center = map.getCenter();
-                onMapStateChange({ lat: center.getLat(), lng: center.getLng() }, map.getLevel());
+                // [NEW] 수동 조작 여부를 함께 전달 (프로그래밍적인 이동이 아닐 때만 true)
+                propsRef.current.onMapStateChange(
+                    { lat: center.getLat(), lng: center.getLng() },
+                    map.getLevel(),
+                    !isProgrammaticMove.current
+                );
             }
             setTimeout(() => { isProgrammaticMove.current = false; }, 300);
         };
@@ -285,6 +290,21 @@ export default function MapComponent({ places, focusedPlace, onMapMove, onMapSta
         map.setLevel(4);
         map.panTo(new window.kakao.maps.LatLng(myLocation.lat, myLocation.lng));
     }, [myLocation, isSdkLoaded]);
+
+    // [NEW] 줌/위치 복구 로직 (이전 목록으로 버튼 대응)
+    useEffect(() => {
+        const map = mapRef.current;
+        if (!map || !isSdkLoaded || !restoreView?.trigger) return;
+
+        // [GUARD] 이미 실행된 동일 트리거면 무시
+        if (lastRestoreTrigger.current === restoreView.trigger) return;
+        lastRestoreTrigger.current = restoreView.trigger;
+
+        isProgrammaticMove.current = true;
+        map.setLevel(restoreView.level);
+        // [MOD] panTo 보다는 setCenter가 복구 시엔 더 정확하고 즉각적임
+        map.setCenter(new window.kakao.maps.LatLng(restoreView.center.lat, restoreView.center.lng));
+    }, [restoreView, isSdkLoaded]);
 
     // 7. Keyword Search & Move (지역명 검색 시 영역 이동)
     useEffect(() => {

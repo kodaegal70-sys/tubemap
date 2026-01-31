@@ -1,0 +1,29 @@
+{
+  "basicInfo": {
+    "placenamefull": "백암왕순대",
+    "address": {
+      "addressname": {
+        "fullAddress": "서울 강남구 선릉로129길 5 1층",
+        "geocodeAddress": "서울 강남구 선릉로129길 5"
+      }
+    },
+    "category": {
+      "fullname": ""
+    },
+    "wgs84": {
+      "lat": 37.51624769549676,
+      "lon": 127.0410174467568
+    },
+    "phonenum": "02-3442-7768",
+    "menu_items": [
+      "순대국밥",
+      "백암순대",
+      "왕순대"
+    ]
+  },
+  "photo": {
+    "selectedPhoto": {
+      "orgurl": ""
+    }
+  }
+}
