@@ -12,6 +12,7 @@ export interface VideoMetadata {
     title: string;
     description: string;
     channelTitle: string;
+    channelId: string; // [ADD] 채널 ID 필드 추가
     publishedAt: string;
     thumbnailUrl: string;
 }
@@ -77,6 +78,7 @@ export class YouTubeCollector {
                 title: item.snippet.title || "",
                 description: item.snippet.description || "",
                 channelTitle: item.snippet.channelTitle || "",
+                channelId: item.snippet.channelId || "", // [ADD] 채널 ID 추출
                 publishedAt: item.snippet.publishedAt || new Date().toISOString(),
                 thumbnailUrl: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || ""
             };

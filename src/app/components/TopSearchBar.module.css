@@ -6,7 +6,8 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-width: 460px;
+    /* [MOD] 데스크톱에서 카테고리가 잘리지 않도록 너비 확장 (460px -> 700px) */
+    max-width: 700px;
     pointer-events: none;
 }
 
@@ -143,13 +144,28 @@
     }
 
     .chipScroll {
-        flex-wrap: wrap;
-        overflow-x: visible;
+        /* [MOD] 줄바꿈 방지 및 가로 스크롤 허용 */
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        padding-right: 40px;
+        /* 마지막 아이템이 페이드에 가리지 않도록 여백 확보 */
+
+        /* [MOD] 스크롤 가능함을 알리는 우측 페이드 효과 */
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+
+        /* 스크롤바 숨기기 (깔끔함 유지) */
+        scrollbar-width: none;
+    }
+
+    .chipScroll::-webkit-scrollbar {
+        display: none;
     }
 
     .chip {
         padding: 6px 12px;
         font-size: 0.8rem;
-        margin-bottom: 4px;
+        margin-bottom: 0;
     }
 }

@@ -115,14 +115,19 @@ export class KakaoScraper {
         const apiKey = process.env.KAKAO_LOCAL_API_KEY;
         if (!apiKey) return null;
 
-        // 이름이나 주소 둘 중 하나는 있어야 검색 가능
-        const query = hint.name || hint.address;
+        // [정확도 향상] 이름과 주소의 앞부분을 조합하여 검색어 생성
+        const cleanName = hint.name?.split('(')[0].trim(); // 괄호 제거
+        const areaMatch = hint.address?.match(/([가-힣]+[시|구|동])/);
+        const area = areaMatch ? areaMatch[0] : "";
+
+        const query = `${area} ${cleanName}`.trim();
+
         if (!query) return null;
 
         try {
-            console.log(`[KakaoScraper] 🔍 Falling back to REST Keywork Search: "${query}"`);
+            console.log(`[KakaoScraper] 🔍 Automated REST Search: "${query}" (Hint: ${hint.name})`);
             const res = await axios.get('https://dapi.kakao.com/v2/local/search/keyword.json', {
-                params: { query, size: 5 },
+                params: { query, size: 3 },
                 headers: { 'Authorization': `KakaoAK ${apiKey}` }
             });
 
@@ -223,7 +228,8 @@ export class KakaoScraper {
         return clean;
     }
 
-    extractPlaceId(url: string): string | null {
+    extractPlaceId(url: string | null): string | null {
+        if (!url) return null;
         const match = url.match(/kakao\.com\/(\d+)/);
         return match ? match[1] : null;
     }

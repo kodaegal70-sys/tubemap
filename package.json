@@ -6,12 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "ingest:kakao": "tsx scripts/run_ingest.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.91.1",
     "axios": "^1.13.3",
-    "dotenv": "^17.2.3",
     "googleapis": "^170.1.0",
     "next": "16.1.4",
     "openai": "^6.16.0",
@@ -26,9 +26,11 @@
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.4",
     "pg": "^8.17.2",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

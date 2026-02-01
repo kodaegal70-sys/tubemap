@@ -9,7 +9,21 @@ export class CuratedCollector {
     private db: any;
     private youtube: YouTubeCollector;
     private kakao: KakaoScraper;
-    private dbEnabled: boolean = true; // DB 시도 여부 플래그
+    private dbEnabled: boolean = true;
+    private targetChannelIds = [
+        "UCl23-Cci_SMqyGXE1T_LYUg", // 성시경 SUNG SI KYUNG
+        "UC4ZA57iJrf73bJlApKFeLRw", // 스튜디오 수제 (또간집)
+        "UCmJEpV4hLzGWLU5rrdOHMhQ", // 더들리
+        "UC1oXmhvYHVI2bApphh3IzuQ", // 정육왕 MeatCreator
+        "UCAoyR-sL6B0S93AMR-HVTvg", // 떡볶퀸 Tteokbokqueen
+        "UCkBoDzncl64EZ-Ggh4g5pCw", // 섬마을훈태TV
+        "UCHbKKd7fH0bVz_F_rJ4jCgA", // 비밀이야 (Classic)
+        "UCaKQ7_GT0k8u_sL0nE2tgkA", // 비밀이야 bimirya (New)
+        "UCQA89gPDjJ-1M1o9bwdGF-g", // 맛있겠다 Yummy
+        "UC8HsdoAxev3Lmmx2RGZH-2w", // 김사원세끼
+        "UCoLPofyAZuuq6v4EWrWRguw", // 회사랑
+        "UCqVjsRNWQM-ZBl27Pp8qI5g"  // 츄릅켠 Chulupkyeon
+    ];
 
     constructor() {
         const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -20,131 +34,99 @@ export class CuratedCollector {
     }
 
     /**
-     * 링크 쌍(유튜브, 카카오)을 처리하여 정보를 추출하고 DB 또는 로컬 파일에 저장
+     * 상세 정보를 1회에 수집한 데이터를 바탕으로 처리 (효율화 버전)
      */
-    async processLinkPair(youtubeUrl: string, kakaoUrl: string, preFetchedKakao?: any): Promise<{ status: string, name: string, reason?: string }> {
+    async processLinkPair(youtubeUrl: string, kakaoUrl: string, siteDetail?: any): Promise<{ status: string, name: string, reason?: string }> {
         try {
             const videoId = this.extractVideoId(youtubeUrl);
-            const kakaoId = this.kakao.extractPlaceId(kakaoUrl);
+            let kakaoId = siteDetail?.kakaoId || this.kakao.extractPlaceId(kakaoUrl);
 
-            if (!videoId || !kakaoId) throw new Error(`Invalid URLs: YT=${videoId}, Kakao=${kakaoId}`);
+            if (!videoId) throw new Error(`Invalid YouTube URL: ${youtubeUrl}`);
 
             // 1. 유튜브 정보 우선 획득
             const videoInfo = await this.youtube.getVideoDetails(videoId);
             if (!videoInfo) throw new Error("Failed to fetch Video Info");
 
-            // 2. 카카오 정보 획득 (주입된 데이터 우선 -> 캐시 -> API)
-            let info: any = preFetchedKakao ? this.kakao.parseKakaoData(kakaoId, preFetchedKakao) : null;
-
-            // [중요] 브라우저에서 선택한 이미지가 있다면 파싱된 결과에 다시 붙여줌
-            if (preFetchedKakao && preFetchedKakao.photo?.selectedPhoto) {
-                info.photo = { selectedPhoto: preFetchedKakao.photo.selectedPhoto };
+            // [Whitelist Check]
+            if (!this.targetChannelIds.includes(videoInfo.channelId)) {
+                return { status: 'skipped', name: videoInfo.channelTitle, reason: `Not in Whitelist` };
             }
 
-            if (!info) {
-                const [fetchedKakao, bestCommentResult] = await Promise.all([
-                    this.kakao.getPlaceDetails(kakaoId, { name: videoInfo.title }),
-                    this.youtube.getBestComment(videoId)
-                ]);
-                info = fetchedKakao;
-                // bestComment 처리는 아래에서
+            // 2. 기본 정보 구성 (사이트 데이터 우선)
+            let info: any = null;
+
+            if (siteDetail && siteDetail.lat && (siteDetail.kakaoId || siteDetail.id)) {
+                console.log(`[CuratedCollector] 📋 Using Site Data: ${siteDetail.name}`);
+                info = {
+                    id: siteDetail.kakaoId || `S${siteDetail.id}`, // kakaoId 우선, 없으면 siteDetail.id
+                    name: siteDetail.name,
+                    category: "식당", // SiteScraper는 카테고리 정보를 제공하지 않으므로 기본값
+                    address: siteDetail.address,
+                    road_address: siteDetail.address, // SiteScraper는 도로명 주소와 지번 주소를 구분하지 않으므로 동일하게 설정
+                    lat: siteDetail.lat,
+                    lng: siteDetail.lng,
+                    menu_primary: siteDetail.menu_primary, // 필드명 통일
+                    phone: "" // SiteScraper는 전화번호 정보를 제공하지 않음
+                };
+            } else if (kakaoId) {
+                info = await this.kakao.getPlaceDetails(kakaoId);
             }
+
+            if (!info) throw new Error(`Missing Info for: ${siteDetail?.name || videoId}`);
 
             const bestComment = await this.youtube.getBestComment(videoId);
-            if (!info) {
-                console.warn(`[CuratedCollector] Kakao Data missing for ${kakaoId}. Using skeleton fallback.`);
-                info = {
-                    id: kakaoId,
-                    name: null,
-                    category: null,
-                    address: null,
-                    phone: null,
-                    lat: 0,
-                    lng: 0,
-                    top_menus: null,
-                    image_url: null
-                };
-            }
+            const finalImageUrl = videoInfo.thumbnailUrl || "";
 
-            // 4. 이미지 결정 (카카오 전용 이미지 확보)
-            const selectedPhoto = (info as any).photo?.selectedPhoto;
-            let finalImageUrl = (info as any).image_url || "";
-            let isKakaoImageValid = !!finalImageUrl;
-
-            if (selectedPhoto && selectedPhoto.orgurl) {
-                console.log(`[CuratedCollector] ✨ 브라우저에서 선택된 최적 이미지 사용: ${selectedPhoto.orgurl.substring(0, 50)}...`);
-                finalImageUrl = selectedPhoto.orgurl;
-                isKakaoImageValid = true;
-            } else {
-                console.log(`[CuratedCollector] 📸 카카오(Vantage) 이미지 없음 -> 유튜브 썸네일로 대체합니다.`);
-                finalImageUrl = videoInfo.thumbnailUrl || ""; // Vantage 없을 시 유튜브 썸네일 사용
-                isKakaoImageValid = !!finalImageUrl;
-            }
-
-            // 5. 데이터 구성 (둘 다 저장)
-            const placeData: any = {
+            const placeData = {
                 kakao_place_id: info.id,
                 name: info.name,
                 name_official: info.name,
-                category: info.category,
-                address: info.address,
+                category: info.category || "식당",
+                address: info.address || "",
                 road_address: info.road_address || "",
                 lat: info.lat || 0,
                 lng: info.lng || 0,
                 phone: info.phone || "",
-
                 channel_title: videoInfo.channelTitle,
                 media_label: `${videoInfo.channelTitle}`,
-
                 video_url: `https://www.youtube.com/watch?v=${videoId}`,
                 video_id: videoId,
-                video_thumbnail_url: videoInfo.thumbnailUrl, // 상세카드용 유튜브 썸네일 (필수)
-
+                video_thumbnail_url: videoInfo.thumbnailUrl,
                 best_comment: bestComment ? bestComment.text : '',
                 best_comment_like_count: bestComment ? bestComment.likes : 0,
-
-                menu_primary: (info as any).top_menus || "",
-                image_url: finalImageUrl, // 일반카드용 카카오 이미지
-
-                image_state: isKakaoImageValid ? 'approved' : 'pending',
-                image_type: isKakaoImageValid ? 'owner_upload' : 'none',
-
+                menu_primary: info.menu_primary || info.top_menus || "", // 두 경로 모두 대응
+                image_url: finalImageUrl,
+                image_state: 'approved',
+                image_type: 'owner_upload',
                 updated_at: new Date().toISOString()
             };
 
-            // 5. [신규] 기존 데이터 로드 및 병합 (DB/파일 저장 전)
+            // 5. 기존 데이터 로드 및 병합
             const existingPlace = this.getExistingPlaceFromOffline(info.id);
             if (existingPlace) {
-                // channel_title & media_label 병합
                 const existingChannels = (existingPlace.channel_title || "").split(',').map((s: string) => s.trim()).filter(Boolean);
                 const newChannels = (videoInfo.channelTitle || "").split(',').map((s: string) => s.trim()).filter(Boolean);
                 const mergedChannels = Array.from(new Set([...existingChannels, ...newChannels]));
-
                 placeData.channel_title = mergedChannels.join(', ');
                 placeData.media_label = mergedChannels.join(', ');
             }
 
-            // 6. DB 저장 (Supabase Upsert) - 점검 중이거나 실패 경험이 있으면 건너뜀
+            // 6. DB 저장
             if (this.dbEnabled) {
                 try {
                     const { error } = await this.db.from('places').upsert(placeData, { onConflict: 'kakao_place_id' });
-                    if (error) {
-                        console.warn(`[CuratedCollector] ⚠️ DB 연결 불가 (서버 점검 중). 오프라인 모드로 즉시 전환.`);
-                        this.dbEnabled = false;
-                    } else {
-                        console.log(`[CuratedCollector] ✅ DB 저장 성공: ${placeData.name}`);
-                    }
-                } catch (dbErr: any) {
+                    if (error) this.dbEnabled = false;
+                    else console.log(`[CuratedCollector] ✅ DB 저장 성공: ${placeData.name}`);
+                } catch (dbErr) {
                     this.dbEnabled = false;
                 }
             }
 
-            // [핵심] 모든 데이터는 무조건 오프라인 파일에 보존 (성공 시든 실패 시든 파일에도 기록)
             this.saveToOfflineFile(placeData);
             return { status: 'success', name: placeData.name };
 
         } catch (error: any) {
-            console.error(`[CuratedCollector] 🚨 수집 처리 중 오류:`, error.message);
+            console.error(`[CuratedCollector] 🚨 오류:`, error.message);
             return { status: 'error', name: '수집 실패', reason: error.message };
         }
     }
@@ -157,14 +139,9 @@ export class CuratedCollector {
             if (fs.existsSync(filePath)) {
                 currentData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
             }
-
             const index = currentData.findIndex((p: any) => p.kakao_place_id === newPlace.kakao_place_id);
-            if (index >= 0) {
-                currentData[index] = newPlace;
-            } else {
-                currentData.push(newPlace);
-            }
-
+            if (index >= 0) currentData[index] = newPlace;
+            else currentData.push(newPlace);
             fs.writeFileSync(filePath, JSON.stringify(currentData, null, 2));
         } catch (e) {
             console.error("[CuratedCollector] Offline save failed", e);
@@ -177,23 +154,12 @@ export class CuratedCollector {
             if (!fs.existsSync(filePath)) return null;
             const currentData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
             return currentData.find((p: any) => p.kakao_place_id === kakaoId) || null;
-        } catch (e) {
-            return null;
-        }
+        } catch (e) { return null; }
     }
 
-    private extractVideoId(url: string): string | null {
+    private extractVideoId(url: string | null): string | null {
+        if (!url) return null;
         const match = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/);
         return match ? match[1] : null;
-    }
-
-    private async validateImage(url: string): Promise<boolean> {
-        if (!url) return false;
-        try {
-            const res = await axios.head(url, { timeout: 3000 });
-            return res.status === 200;
-        } catch {
-            return false;
-        }
     }
 }

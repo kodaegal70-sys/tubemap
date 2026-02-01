@@ -61,7 +61,7 @@ const TopSearchBar = memo(function TopSearchBar({ value = '', onSearch, onCatego
             </div>
 
             <div className={styles.chipScroll}>
-                {['한식', '중식', '일식', '양식', '분식', '기타'].map(cat => (
+                {['한식', '중식', '일식', '양식', '분식', '아시안', '카페/디저트', '기타'].map(cat => (
                     <div
                         key={cat}
                         className={`${styles.chip} ${selectedCategories.includes(cat) ? styles.chipActive : ''}`}
